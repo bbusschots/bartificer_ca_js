@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>bartificer.ca.Automaton Demo</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="./lib/bartificer.ca.js"></script>
+    <script type="text/javascript">
+        var sampleCA;
+        $(function(){
+            sampleCA = new bartificer.ca.Automaton(
+                $('main'), // use the main tag as the container
+                10, 10, // make it a 10x10 grid
+                function(){ return true; }, // always set the state to true
+                function($td){ $td.css('background-color', 'Green') }, // always render as green
+                true // set the initial state of all cells to true
+            );
+            console.log(sampleCA);
+        });
+    </script>
+    <style type="text/css">
+        /* style the cells in the automaton */
+        td.bartificer-ca-cell{
+            width: 10px;
+            height: 10px;
+        }
+    </style>
+</head>
+<body>
+<header><h1>A Sample Cellular Automaton</h1></header>
+<main></main>
+</body>
+</html>
