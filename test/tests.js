@@ -483,3 +483,585 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
         });
     });
 });
+
+//
+// === The Automaton Prototype ================================================
+//
+
+QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
+    //
+    // --- The Constructor ---
+    //
+    QUnit.module('constructor', {}, function(){
+        QUnit.test('function exists', function(a){
+            a.strictEqual(typeof bartificer.ca.Automaton, 'function', "has typeof 'function'");
+        });
+        
+        QUnit.test('argument processing', function(a){
+            a.expect(12);
+            
+            // make sure required arguments are indeed required
+            a.throws(
+                function(){
+                    var c1 = new bartificer.ca.Automaton();
+                },
+                TypeError,
+                'throws error when called with no arguments'
+            );
+            a.throws(
+                function(){
+                    var c1 = new bartificer.ca.Automaton($('<div></div>'));
+                },
+                TypeError,
+                'throws error when called without second argument'
+            );
+            a.throws(
+                function(){
+                    var c1 = new bartificer.ca.Automaton($('<div></div>'), 10);
+                },
+                TypeError,
+                'throws error when called without third argument'
+            );
+            a.throws(
+                function(){
+                    var c1 = new bartificer.ca.Automaton($('<div></div>'), 10, 10);
+                },
+                TypeError,
+                'throws error when called without fourth argument'
+            );
+            a.throws(
+                function(){
+                    var c1 = new bartificer.ca.Automaton($('<div></div>'), 10, 10, function(){});
+                },
+                TypeError,
+                'throws error when called without fifth argument'
+            );
+            
+            // make sure valid values for all required arguments are allowed
+            a.ok(new bartificer.ca.Automaton($('<div></div>'), 10, 10, function(){}, function(){}), "valid arguments don't throw error");
+            
+            // make sure optional arguments are allowed
+            a.ok(new bartificer.ca.Automaton($('<div></div>'), 10, 10, function(){}, function(){}, true), 'presence of optional sixth argument does not trow an error');
+            
+            // make sure all values passed are properly stored
+            var $div = $('<div></div>');
+            var r = 10;
+            var c = 10;
+            var sFn = function(){ return true; };
+            var rFn = function(){};
+            var s = true;
+            var ca1 = new bartificer.ca.Automaton($div, r, c, sFn, rFn, s);
+            a.strictEqual(ca1._$container, $div, 'the container was correctly stored within the object');
+            a.strictEqual(ca1._rows, r, 'the number of rows was correctly stored within the object');
+            a.strictEqual(ca1._cols, c, 'the number of columns was correctly stored within the object');
+            a.strictEqual(ca1._stepFn, sFn, 'the step function was correctly stored within the object');
+            a.strictEqual(ca1._renderFn, rFn, 'the render function was correctly stored within the object');
+        });
+        
+        QUnit.test('$container validation', function(a){
+            var mustThrow = dummyBasicTypesExcept('obj');
+            var okTags = ['div', 'p', 'main', 'section'];
+            
+            a.expect(mustThrow.length + okTags.length + 4);
+            
+            // make sure all the basic types except object throw an error
+            mustThrow.forEach(function(tn){
+                var t = DUMMY_BASIC_TYPES[tn];
+                a.throws(
+                    function(){
+                        var ca1 = new bartificer.ca.Automaton(t.val, 10, 10, function(){}, function(){});
+                    },
+                    TypeError,
+                    '$container cannot be ' + t.desc
+                );
+            });
+            
+            // make sure an object that is not a jQuery object throws an error
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton(DUMMY_DATA.obj_proto.val, 10, 10, function(){}, function(){});
+                },
+                TypeError,
+                '$container cannot be a reference to an object with a prototype other than jQuery'
+            );
+            
+            // make sure an empty jQuery object is not accepted
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton(DUMMY_DATA.obj_jQuery_empty.val, 10, 10, function(){}, function(){});
+                },
+                TypeError,
+                '$container cannot be a reference to a empty jQuery object'
+            );
+            
+            // make sure a jQuery object representing multiple elements will not be accepted
+            var $multi = $().add($('<div></div>')).add($('<div></div>'));
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton($multi, 10, 10, function(){}, function(){});
+                },
+                TypeError,
+                '$container cannot be a reference to a jQuery object representing multiple elements'
+            );
+            
+            // make sure a jQuery object representing something other than a td throws an error
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton($('<span></span>'), 10, 10, function(){}, function(){});
+                },
+                TypeError,
+                '$container cannot be a reference to a jQuery object representing a span'
+            );
+            
+            // make sure each acceptable element does not throw
+            okTags.forEach(function(t){
+                a.ok(
+                    new bartificer.ca.Automaton($('<' + t + '></' + t + '>'), 10, 10, function(){}, function(){}),
+                    '$container can be a ' + t
+                );
+            });
+        });
+        
+        QUnit.test('grid dimension validation', function(a){
+            var mustThrow = dummyBasicTypesExcept('num');
+            
+            a.expect((mustThrow.length * 2) + 8);
+            
+            var $div = $('<div></div>');
+            var sFn = function(){};
+            var rFn = function(){};
+            
+            // make sure all the basic types except number throw an error
+            mustThrow.forEach(function(tn){
+                var t = DUMMY_BASIC_TYPES[tn];
+                a.throws(
+                    function(){
+                        var ca1 = new bartificer.ca.Automaton($div, t.val, 10, sFn, rFn);
+                    },
+                    TypeError,
+                    'number of rows cannot be ' + t.desc
+                );
+                a.throws(
+                    function(){
+                        var ca1 = new bartificer.ca.Automaton($div, 10, t.val, sFn, rFn);
+                    },
+                    TypeError,
+                    'number of columns cannot be ' + t.desc
+                );
+            });
+            
+            // make sure 0 throws an error
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton($div, 0, 10, sFn, rFn);
+                },
+                TypeError,
+                'number of rows cannot be zero'
+            );
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton($div, 10, 0, sFn, rFn);
+                },
+                TypeError,
+                'number of columns cannot be zero'
+            );
+            
+            // make sure negative numbers throw an error
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton($div, -1, 10, sFn, rFn);
+                },
+                TypeError,
+                'number of rows cannot be negative'
+            );
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton($div, 10, -1, sFn, rFn);
+                },
+                TypeError,
+                'number of columns cannot be negative'
+            );
+            
+            // make sure decimal numbers throw an error
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton($div, Math.PI, 10, sFn, rFn);
+                },
+                TypeError,
+                'number of rows cannot be a non-integer number'
+            );
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton($div, 10, Math.PI, sFn, rFn);
+                },
+                TypeError,
+                'number of columns cannot be a non-integer number'
+            );
+            
+            // make sure 1 is allowed
+            a.ok(new bartificer.ca.Automaton($div, 1, 1, sFn, rFn), 'number or rows and columns can be 1');
+            
+            // make sure positive numbers are allowed
+            a.ok(new bartificer.ca.Automaton($('<div></div>'), 42, 42, sFn, rFn), 'number of rows and columns can be 42');
+        });
+        
+        QUnit.test('callback validation', function(a){
+            var mustThrow = dummyBasicTypesExcept('fn');
+            
+            a.expect(mustThrow.length * 2);
+            
+            var $div = $('<div></div>');
+            var r = 10;
+            var c = 10;
+            var fn = function(){};
+            
+            // make sure all the basic types except number throw an error
+            mustThrow.forEach(function(tn){
+                var t = DUMMY_BASIC_TYPES[tn];
+                a.throws(
+                    function(){
+                        var ca1 = new bartificer.ca.Automaton($div, r, c, t.val, fn);
+                    },
+                    TypeError,
+                    'step function cannot be ' + t.desc
+                );
+                a.throws(
+                    function(){
+                        var ca1 = new bartificer.ca.Automaton($div, r, c, fn, t.val);
+                    },
+                    TypeError,
+                    'render function cannot be ' + t.desc
+                );
+            });
+        });
+        
+        QUnit.test('initial state validation', function(a){
+            var mustThrow = dummyBasicTypesExcept('bool', 'num', 'str', 'arr', 'fn', 'undef');
+            var mustNotThrow = ['bool', 'num', 'str', 'fn'];
+            
+            a.expect(mustThrow.length + mustNotThrow.length + 4);
+            
+            var r = 2;
+            var c = 2;
+            var fn = function(){};
+            
+            // make sure all the disalowed basic types throw an error
+            mustThrow.forEach(function(tn){
+                var t = DUMMY_BASIC_TYPES[tn];
+                a.throws(
+                    function(){
+                        var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, t.val);
+                    },
+                    TypeError,
+                    'initial state cannot be ' + t.desc
+                );
+            });
+            
+            // make sure allowed basic types don't throw (except array which is a little more complex)
+            mustNotThrow.forEach(function(tn){
+                var t = DUMMY_BASIC_TYPES[tn];
+                a.ok(
+                    new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, t.val),
+                    'initial state can be ' + t.desc
+                );
+            });
+            
+            // make sure arrays of the wrong dimension throw
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, [true, true, true]);
+                },
+                TypeError,
+                'initial state cannot be a 1D array'
+            );
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, [[true], [true], [true]]);
+                },
+                TypeError,
+                'initial state cannot be a 2D array of the wrong dimensions'
+            );
+            
+            // make sure arrays containing even one invalid value throw
+            a.throws(
+                function(){
+                    var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, [[true, true], [[], true]]);
+                },
+                TypeError,
+                'initial state cannot be a 2D array of the correct dimension containing an invalid value'
+            );
+            
+            // make sure arrays with the correct dimension and no invalid data do not throw
+            a.ok(
+                new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, [[true, true], [true, true]]),
+                'initial state can be a 2D array with the correct dimensions and all valid data'
+            );
+        });
+        
+        QUnit.test('grid was correctly initialised', function(a){
+            var r = 2;
+            var c = 2;
+            var fn = function(){};
+            a.expect(5);
+            
+            // build a sample CA
+            var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, true);
+            
+            // looping variables
+            var x;
+            var y;
+            
+            // make sure the grid has the right shape
+            var shapeOK = true;
+            for(x = 0; x < c && shapeOK; x++){
+                // make sure top-level element is an array
+                if($.isArray(ca1._grid[x])){
+                    if(!ca1._grid[x].length === c){
+                        shapeOK = false;
+                    }
+                }else{
+                    shapeOK = false;
+                }
+            }
+            a.ok(shapeOK, 'grid shape OK');
+            if(!shapeOK){
+                throw new Error('cannot continue with mis-shapen grid');
+            }
+            
+            // make sure each element in the grid is a cell
+            var allCellProtosOK = true;
+            for(x = 0; x < c && allCellProtosOK; x++){
+                for(y = 0; y < r && allCellProtosOK; y++){
+                    if(!(ca1._grid[x][y] instanceof bartificer.ca.Cell)){
+                        allCellProtosOK = false;
+                    }
+                }
+            }
+            a.ok(allCellProtosOK, 'all cells have prototype bartificer.ca.Cell');
+            if(!allCellProtosOK){
+                throw new Error('cannot continue with improperly initialised grid');
+            }
+            
+            // check initialisation with single state
+            var singleStateOK = true;
+            for(x = 0; x < c && singleStateOK; x++){
+                for(y = 0; y < r && singleStateOK; y++){
+                    if(ca1._grid[x][y].state() !== true){
+                        singleStateOK = false;
+                    }
+                }
+            }
+            a.ok(singleStateOK, 'All cells in CA created with single-value initial state have the expected state');
+            
+            // check initialation with array of states
+            var stateArray = [['1', '2'], ['3', '4']];
+            var ca2 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, stateArray);
+            var stateArrayOK = true;
+            for(x = 0; x < c && stateArrayOK; x++){
+                for(y = 0; y < r && stateArrayOK; y++){
+                    if(ca2._grid[x][y].state() !== stateArray[x][y]){
+                        stateArrayOK = false;
+                    }
+                }
+            }
+            a.ok(stateArrayOK, 'All cells in CA created with an array of initial states have the expected state');
+            
+            // check initialisation with function
+            var stateCB = function(x, y){
+                return 'x=' + x + ' & y=' + y;
+            };
+            var ca3 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, stateCB);
+            var stateCBOK = true;
+            for(x = 0; x < c && stateCBOK; x++){
+                for(y = 0; y < r && stateCBOK; y++){
+                    if(ca3._grid[x][y].state() !== stateCB(x, y)){
+                        stateCBOK = false;
+                    }
+                }
+            }
+            a.ok(stateCBOK, 'All cells in CA created with an initial state function have the expected state');
+        });
+        
+        QUnit.test('table was correctly generated', function(a){
+            a.expect(2);
+            var r = 4;
+            var c = 4;
+            var fn = function(){};
+            var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn);
+            a.equal($('table', ca1.$container()).length, 1, 'exactly one table in container');
+            a.equal($('td', ca1.$container()).length, r * c, 'correct number of table data cells in container');
+        });
+        
+        QUnit.test('check DOM alterations', function(a){
+            a.expect(4);
+            
+            var $div = $('<div></div>');
+            var r = 4;
+            var c = 4;
+            var fn = function(){};
+            
+            // create an automaton
+            var ca1 = new bartificer.ca.Automaton($div, r, c, fn, fn);
+            
+            // make sure the expect class was added to the container & table
+            a.ok($div.hasClass('bartificer-ca-container'), "the class 'bartificer-ca-container' was added to the container");
+            a.ok(ca1.$table().hasClass('bartificer-ca-automaton'), "the class 'bartificer-ca-automaton' was added to the generated table");
+            
+            // make sure the data attribute was added to the container & table
+            a.strictEqual($div.data('bartificerObject'), ca1, 'reference to object added as data attribute on container');
+            a.strictEqual(ca1.$table().data('bartificerObject'), ca1, 'reference to object added as data attribute on generated table');
+        });
+        
+        QUnit.test('reinitialisation prevented', function(a){
+            var $div = $('<div></div>');
+            var r = 4;
+            var c = 4;
+            var fn = function(){};
+            var ca1 = new bartificer.ca.Automaton($div, r, c, fn, fn);
+            
+            // make sure an error is thrown if there is an attempt to re-use the same div
+            a.throws(
+                function(){ var c2 = new bartificer.ca.Automaton($div, r, c, fn, fn); },
+                Error,
+                'an error is thrown if an attempt is made to use the same div for a second Automaton object'
+            );
+        });
+    });
+    
+    QUnit.module(
+        'read-only accessors',
+        {
+            beforeEach: function(){
+                this.$div = $('<div></div>');
+                this.r = 4;
+                this.c = 2;
+                this.sFn = function(){ return true; };
+                this.rFn = function(){};
+                this.ca1 = new bartificer.ca.Automaton(this.$div, this.r, this.c, this.sFn, this.rFn, true);
+            }
+        },
+        function(){
+            QUnit.test('.$container()', function(a){
+                a.expect(3);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.$container, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                a.strictEqual(this.ca1.$container(), this.$div, 'returns the expected value');
+                
+                // make sure attempts to set a value throw an Error
+                a.throws(
+                    function(){ this.ca1.$container($('<p></p>')); },
+                    Error,
+                    'attempt to set throws error'
+                );
+            });
+            QUnit.test('.rows()', function(a){
+                a.expect(3);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.rows, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                a.strictEqual(this.ca1.rows(), this.r, 'returns the expected value');
+                
+                // make sure attempts to set a value throw an Error
+                a.throws(
+                    function(){ this.ca1.rows(5); },
+                    Error,
+                    'attempt to set throws error'
+                );
+            });
+            QUnit.test('.cols()', function(a){
+                a.expect(3);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.cols, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                a.strictEqual(this.ca1.cols(), this.c, 'returns the expected value');
+                
+                // make sure attempts to set a value throw an Error
+                a.throws(
+                    function(){ this.ca1.cols(5); },
+                    Error,
+                    'attempt to set throws error'
+                );
+            });
+            QUnit.test('.dimensions()', function(a){
+                a.expect(4);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.dimensions, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                a.deepEqual(this.ca1.dimensions(), [this.c, this.r], 'returns the expected value');
+                
+                // make sure attempts to set values throw a Errors
+                a.throws(
+                    function(){ this.ca1.dimensions([3, 5]); },
+                    Error,
+                    'attempt to set with one argumet throws error'
+                );
+                a.throws(
+                    function(){ this.ca1.dimensions(3, 5); },
+                    Error,
+                    'attempt to set with two argumets throws error'
+                );
+            });
+            QUnit.test('.stepFunction()', function(a){
+                a.expect(3);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.stepFunction, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                a.strictEqual(this.ca1.stepFunction(), this.sFn, 'returns the expected value');
+                
+                // make sure attempts to set a value throw an Error
+                a.throws(
+                    function(){ this.ca1.stepFunction(function(){}); },
+                    Error,
+                    'attempt to set throws error'
+                );
+            });
+            QUnit.test('.renderFunction()', function(a){
+                a.expect(3);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.renderFunction, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                a.strictEqual(this.ca1.renderFunction(), this.rFn, 'returns the expected value');
+                
+                // make sure attempts to set a value throw an Error
+                a.throws(
+                    function(){ this.ca1.renderFunction(function(){}); },
+                    Error,
+                    'attempt to set throws error'
+                );
+            });
+            QUnit.test('.cell()', function(a){
+                a.expect(2);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.cell, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                a.strictEqual(this.ca1.cell(1, 2), this.ca1._grid[1][2], 'returns the expected value');
+            });
+            QUnit.test('.cellState()', function(a){
+                a.expect(2);
+                
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.cellState, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                var initStates = [[1, 2], [3, 4]];
+                var ca2 = new bartificer.ca.Automaton($('<div></div>'), 2, 2, this.sFn, this.rFn, initStates);
+                a.strictEqual(ca2.cellState(0, 1), initStates[0][1], 'returns the expected value');
+            });
+        }
+    );
+});
