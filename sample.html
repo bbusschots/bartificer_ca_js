@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>bartificer.ca.Automaton Demo</title>
+    <title>bartificer.ca.Automaton Demo - Conway's Game of Life</title>
     
     <!-- Load jQuery 3 from the official CDN -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
@@ -15,20 +15,66 @@
         // a globally scoped variable to hold the automaton object
         var sampleCA;
         
+        // a render function to render live cells green and dead cells red
+        function renderRedGreen($td, s){
+            // render a true state as green, and false as red
+            if(s == true){
+                $td.css('background-color', 'Green');
+            }else{
+                $td.css('background-color', 'Red');
+            }
+        }
+        
+        // an initialisation function to randomly set each cell to true or false
+        function randomBoolean(){
+            return Math.random() < 0.5 ? true : false;
+        }
+        
+        // a step function that implements Conway's game of life
+        function lifeStep(currentState, neighbourStates){
+            // calcualte the number of live neighbours
+            var numLiveNeighbours = 0;
+            neighbourStates.forEach(function(s){
+                if(s == true) numLiveNeighbours++;
+            });
+            
+            // apply the rules based on the current state
+            if(currentState == true){
+                // currently alive - apply rules 1 to 3
+                
+                // rule 1
+                if(numLiveNeighbours < 2) return false;
+                
+                // rule 3
+                if(numLiveNeighbours > 3) return false;
+            }else{
+                // currently dead - apply rule 4
+                if(numLiveNeighbours === 3) return true;
+            }
+            
+            // default to no change (incorporates rule 2)
+            return currentState;
+        }
+        
         // add a document ready event handler
         $(function(){
             // use the constructor to build an automaton
             sampleCA = new bartificer.ca.Automaton(
-                $('main'), // use the main tag as the container
-                10, 10, // make it a 10x10 grid
-                function(){ return true; }, // always set the state to true
-                function($td){ $td.css('background-color', 'Green') }, // always render as green
-                true // set the initial state of all cells to true
+                $('#game_of_life_container'), // use the div as the container
+                50, 100, // make it a 100x50 grid
+                lifeStep, // pass the game of life step function
+                renderRedGreen, // pass our red/green render function
+                randomBoolean // initialise each cell to a random boolean
             );
             
             // log the geneated automaton object so we can have a look inside
-            // it look at it with the JavaScript console if we want
+            // it in the JavaScript console if we want
             console.log(sampleCA);
+            
+            // add a click handler to the step button
+            $('#step1_btn').click(function(){
+                sampleCA.step();
+            });
         });
     </script>
     
@@ -42,7 +88,13 @@
     </style>
 </head>
 <body>
-<header><h1>A Sample Cellular Automaton</h1></header>
-<main></main>
+<header><h1>A Sample Cellular Automaton - Conway's Game of Life</h1></header>
+<main>
+    <form action="javascript:void(0);">
+    <p><button type="button" id="step1_btn">Step Forward 1x</button></p>
+    </form>
+    <div id="game_of_life_container"></div>
+    <p>For more information on Conway's Game of Life <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life" target="_blank" rel="noopener">see this Wikipedia article</a>.</p>
+</main>
 </body>
 </html>
