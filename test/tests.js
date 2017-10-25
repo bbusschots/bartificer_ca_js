@@ -498,7 +498,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         });
         
         QUnit.test('argument processing', function(a){
-            a.expect(12);
+            a.expect(15);
             
             // make sure required arguments are indeed required
             a.throws(
@@ -556,6 +556,39 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             a.strictEqual(ca1._cols, c, 'the number of columns was correctly stored within the object');
             a.strictEqual(ca1._stepFn, sFn, 'the step function was correctly stored within the object');
             a.strictEqual(ca1._renderFn, rFn, 'the render function was correctly stored within the object');
+            
+            // make sure the optional initial state is properly applied
+            var allCellsOK = true;
+            var x, y;
+            for(x = 0; x < c && allCellsOK; x++){
+                for(y = 0; y < r; y++){
+                    if(ca1.cell(x, y).state() !== s) allCellsOK = false;
+                }
+            }
+            a.ok(allCellsOK, 'single initial state correctly applied to all cells');
+            var initStates = [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 8]
+            ];
+            var ca2 = new bartificer.ca.Automaton($('<div></div>'), 3, 3, sFn, rFn, initStates);
+            allCellsOK = true;
+            for(x = 0; x < 3 && allCellsOK; x++){
+                for(y = 0; y < 3; y++){
+                    if(ca2.cell(x, y).state() !== initStates[x][y]) allCellsOK = false;
+                }
+            }
+            a.ok(allCellsOK, '2D array of initial states correctly applied to all cells');
+            var ca3 = new bartificer.ca.Automaton($('<div></div>'), 3, 3, sFn, rFn, function(x, y){
+                return x + ', ' + y;
+            });
+            allCellsOK = true;
+            for(x = 0; x < 3 && allCellsOK; x++){
+                for(y = 0; y < 3; y++){
+                    if(ca3.cell(x, y).state() !== x + ', ' + y) allCellsOK = false;
+                }
+            }
+            a.ok(allCellsOK, 'Initialisation function correctly applied to all cells');
         });
         
         QUnit.test('$container validation', function(a){

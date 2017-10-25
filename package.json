@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A JavaScript prototype for creating celluar automata.",
   "scripts": {
+    "test": "open test/index.html -a /Applications/Safari.app",
     "generate-docs": "node_modules/.bin/jsdoc --configure jsdoc.conf.json",
     "generate-docs-dev": "node_modules/.bin/jsdoc --configure jsdoc.conf.json --private --destination ./docs-dev"
   },
