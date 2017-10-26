@@ -1095,6 +1095,84 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                 var ca2 = new bartificer.ca.Automaton($('<div></div>'), 2, 2, this.sFn, this.rFn, initStates);
                 a.strictEqual(ca2.cellState(0, 1), initStates[0][1], 'returns the expected value');
             });
+            QUnit.test('.cellNeighbourStates()', function(a){
+                a.expect(6);
+                
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.cellNeighbourStates, 'function', 'function exists');
+                
+                // build a CA to test against
+                var stateArray = [
+                    [1,  6, 11, 16],
+                    [2,  7, 12, 17],
+                    [3,  8, 13, 18],
+                    [4,  9, 14, 19],
+                    [5, 10, 15, 20]
+                ];
+                // above represents grid:
+                //  1  2  3  4  5
+                //  6  7  8  9 10
+                // 11 12 13 14 15
+                // 16 17 18 19 20
+                var ca = new bartificer.ca.Automaton($('<div></div>'), 4, 5, this.sFn, this.rFn, stateArray);
+                
+                // check an internal cell
+                a.deepEqual(ca.cellNeighbourStates(3, 2), [9, 10, 15, 20, 19, 18, 13, 8], 'internal cell OK');
+                
+                // check the four corners
+                a.deepEqual(ca.cellNeighbourStates(0, 0), [null, null, 2, 7, 6, null, null, null], 'top-left corner OK');
+                a.deepEqual(ca.cellNeighbourStates(4, 0), [null, null, null, null, 10, 9, 4, null], 'top-right corner OK');
+                a.deepEqual(ca.cellNeighbourStates(4, 3), [15, null, null, null, null, null, 19, 14], 'bottom-right corner OK');
+                a.deepEqual(ca.cellNeighbourStates(0, 3), [11, 12, 17, null, null, null, null, null], 'bottom-left corner OK');
+            });
         }
     );
+    
+    QUnit.test('.setState()', function(a){
+        a.expect(3);
+        var $div = $('<div></div>');
+        var r = 3;
+        var c = 3;
+        var sFn = function(){ return true; };
+        var rFn = function(){};
+        var allCellsOK = true;
+        var x, y;
+        var ca = new bartificer.ca.Automaton($div, r, c, sFn, rFn, true);
+        
+        // test when given a single state
+        ca.setState('boogers');
+        for(x = 0; x < c && allCellsOK; x++){
+            for(y = 0; y < r; y++){
+                if(ca.cell(x, y).state() !== 'boogers') allCellsOK = false;
+            }
+        }
+        a.ok(allCellsOK, 'single initial state correctly applied to all cells');
+        
+        // test when given a grid of states
+        var initStates = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 8]
+        ];
+        ca.setState(initStates);
+        allCellsOK = true;
+        for(x = 0; x < c && allCellsOK; x++){
+            for(y = 0; y < r; y++){
+                if(ca.cell(x, y).state() !== initStates[x][y]) allCellsOK = false;
+            }
+        }
+        a.ok(allCellsOK, '2D array of initial states correctly applied to all cells');
+        
+        // test when given a callback
+        ca.setState(function(x, y){    
+            return x + ', ' + y;
+        });
+        allCellsOK = true;
+        for(x = 0; x < 3 && allCellsOK; x++){
+            for(y = 0; y < 3; y++){
+                if(ca.cell(x, y).state() !== x + ', ' + y) allCellsOK = false;
+            }
+        }
+        a.ok(allCellsOK, 'Initialisation function correctly applied to all cells');
+    });
 });
