@@ -7,4 +7,7 @@ node_modules
 
 # IDE config files
 *.komodoproject
+
+# temporary files
 docs-test/
+temp*.html

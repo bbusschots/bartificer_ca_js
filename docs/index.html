@@ -47,6 +47,129 @@
     
 
 
+    <section class="readme">
+        <article><h1>bartificer.ca.js</h1><p>A JavaScript API for creating <a href="https://en.wikipedia.org/wiki/Cellular_automaton">Cellular Automata</a>.</p>
+<p>This API requires <a href="http://jquery.com">jQuery</a>.</p>
+<p>The constructor for the <code>bartificer.ca.Automaton</code> prototype builds a table to
+reprsent a Cellular Automaton (CA), and injects it into a given container. The
+table will contain a cell for each cell in the CA.</p>
+<p>As well as the container to inject the table into, the constructor also expects
+to be passed a number of rows and columns, two callbacks, and optionally an
+initial state for each cell in the automaton.</p>
+<p>The first of the expected callbacks is the so-called <em>step function</em>, which
+will be used to calculate the next state of each cell given the cell's current
+state and the current state of all it's neighbours</p>
+<p>The second expected callback is the so-called <em>render function</em>, which will be
+used to alter the content and style of each table cell so it reflects the
+current state of the matching cell in the CA.</p>
+<p>Finally, the constructor accepts an optional initial state for each cell in the
+automaton as a single state to be applied to all cells, a 2D array of states
+for each cell, or a callback that should return the state for each cell given
+its <code>x</code> and <code>y</code> coordinate as input.</p>
+<h2>Include into Page from CDN</h2><p>You can download the code into your own project, or, include it directly from
+a CDN:</p>
+<pre class="prettyprint source"><code>&lt;!-- Import jQuery (required by bartificer.ca) -->
+&lt;script src=&quot;https://code.jquery.com/jquery-3.2.1.slim.min.js&quot; integrity=&quot;sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=&quot; crossorigin=&quot;anonymous&quot;>&lt;/script>
+
+&lt;!-- Import bartificer.ca -->
+&lt;script src=&quot;https://rawgit.com/bbusschots/bartificer_ca_js/master/lib/bartificer.ca.js&quot;>&lt;/script></code></pre><h2>API Documentation</h2><p>Full documentation for the public API can be found at <a href="https://bbusschots.github.io/bartificer_ca_js/">bbusschots.github.io/…</a>.</p>
+<p>Those wishing to contribute to the project can generate developer documentation
+which includes internal private symbols by downloading or checking out the code
+from <a href="https://github.com/bbusschots/bartificer_ca_js/">github.com/…</a> and then
+running the commands:</p>
+<pre class="prettyprint source"><code>npm install
+npm generate-docs-dev</code></pre><h2>Example</h2><p>An HTML page that implements <a href="https://en.wikipedia.org/wiki/Conway's_Game_of_Life">Conway's Game of Life</a>
+using the <code>bartificer.ca.Automaton</code> prototype:</p>
+<pre class="prettyprint source"><code>&lt;!DOCTYPE HTML>
+&lt;html>
+&lt;head>
+    &lt;meta charset=&quot;utf-8&quot; />
+    &lt;title>bartificer.ca.Automaton Example - Conway's Game of Life&lt;/title>
+
+    &lt;!-- Import jQuery (required by bartificer.ca) -->
+    &lt;script src=&quot;https://code.jquery.com/jquery-3.2.1.slim.min.js&quot; integrity=&quot;sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=&quot; crossorigin=&quot;anonymous&quot;>&lt;/script>
+
+    &lt;!-- Import bartificer.ca -->
+    &lt;script src=&quot;https://rawgit.com/bbusschots/bartificer_ca_js/master/lib/bartificer.ca.js&quot;>&lt;/script>
+
+    &lt;!-- Add the JavaScript code to initialise a Cellular Automaton -->
+    &lt;script type=&quot;text/javascript&quot;>
+        // a globally scoped variable to hold the automaton object
+        var ConwayGOLCA;
+
+        // a step function that implements Conway's game of life
+        function lifeStep(currentState, neighbourStates){
+            // calcualte the number of live neighbours
+            var numLiveNeighbours = 0;
+            neighbourStates.forEach(function(s){
+                if(s == true) numLiveNeighbours++;
+            });
+
+            // apply the rules based on the current state
+            if(currentState == true){
+                // currently alive - apply rules 1 to 3
+
+                // rule 1
+                if(numLiveNeighbours &lt; 2) return false;
+
+                // rule 3
+                if(numLiveNeighbours > 3) return false;
+            }else{
+                // currently dead - apply rule 4
+                if(numLiveNeighbours === 3) return true;
+            }
+
+            // default to no change (incorporates rule 2)
+            return currentState;
+        }
+
+        // a render function to render live cells green and dead cells red
+        function renderRedGreen($td, s){
+            // render a true state as green, and false as red
+            if(s == true){
+                $td.css('background-color', 'Green');
+            }else{
+                $td.css('background-color', 'Red');
+            }
+        }
+
+        // an initialisation function to randomly set each cell to true or false
+        function randomBoolean(){
+            return Math.random() &lt; 0.5 ? true : false;
+        }
+
+        // add a document ready event handler to initialise the CA
+        $(function(){
+            // use the constructor to build an automaton
+            ConwayGOLCA = new bartificer.ca.Automaton(
+                $('main'), // use the main tag as the container
+                50, 100, // 50 rows and 100 cols
+                lifeStep, // pass the game of life step function
+                renderRedGreen, // pass our red/green render function
+                randomBoolean // initialise each cell to a random boolean
+            );
+
+            // start an interval that will advance the CA every quarter second
+            window.setInterval(function(){ ConwayGOLCA.step(); }, 250);
+        });
+    &lt;/script>
+
+    &lt;!-- Stype the Automaton -->
+    &lt;style type=&quot;text/css&quot;>
+        /* style the cells in the automaton */
+        td.bartificer-ca-cell{
+            width: 10px;
+            height: 10px;
+        }
+    &lt;/style>
+&lt;/head>
+&lt;body>
+&lt;header>&lt;h1>Conway's Game of Life&lt;/h1>&lt;/header>
+&lt;main>&lt;/main>
+&lt;/body>
+&lt;/html></code></pre></article>
+    </section>
+
 
 
 
@@ -60,7 +183,7 @@
 <header>
     
         <h2>
-        bartificer.ca.js
+        docs-globals.jsdoc
         </h2>
         
     
@@ -70,8 +193,107 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>A JavaScript API for creating Celluar Automata.
-    This API is entirely contained within the namespace <a href="bartificer.ca.html">bartificer.ca</a>.</p></div>
+            <div class="description"><p>This file provides global JSDoc symbols used throughout
+the API's documentation.</p></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Bart Busschots</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+    <dt class="tag-license">License:</dt>
+    <dd class="tag-license"><ul class="dummy"><li>BSD-2-Clause</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        lib/bartificer.ca.js
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>This file provides the <a href="bartificer.ca.html">bartificer.ca</a> namespace which acts
+as the container for the entire API.</p></div>
         
 
         
@@ -121,13 +343,6 @@
     
 
     
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="https://github.com/bbusschots/bartificer_ca_js">https://github.com/bbusschots/bartificer_ca_js</a></li>
-        </ul>
-    </dd>
-    
 
     
 </dl>
@@ -166,7 +381,7 @@
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Wed Oct 25 2017 02:25:38 GMT+0100 (IST) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Oct 29 2017 01:33:14 GMT+0000 (GMT) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

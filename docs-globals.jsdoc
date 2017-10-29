@@ -1,0 +1,109 @@
+/**
+* @overview This file provides global JSDoc symbols used throughout
+* the API's documentation.
+* @author Bart Busschots
+* @license BSD-2-Clause
+*/
+
+//
+//=== Define External Symbols =================================================
+//
+
+/**
+* A jQuery object.
+* @external jQuery
+* @see {@link http://api.jquery.com/}
+*/
+
+//
+//=== Define Global Types =====================================================
+//
+
+/**
+* A plain JavaScript object, i.e. an object with no prototype other than
+* `Object`.
+*
+* jQuery's `$.isPlainObject()` function is used to validate this type.
+* @typedef {Object} PlainObject
+* @see external:jQuery
+*/
+
+/**
+* A jQuery object representing exactly one element which can be used as a
+* container for a cellular automaton. The following HTML elements are
+* premitted:
+* * `div`
+* * `p`
+* * `main`
+* * `section`
+* @typedef {external:jQuery} jQuerySingleContainer
+*/
+
+/**
+* A jQuery object representing exactly one `table` element.
+* @typedef {external:jQuery} jQuerySingleTable
+*/
+
+/**
+* A jQuery object representing exactly one table data cell (`td` element).
+* @typedef {external:jQuery} jQuerySingleTD
+*/
+
+/**
+* A number representing an x or y coordinate within a CA. Specifically, a whole
+* number greater than or equal to zero.
+* @typedef {number} GridCoordinate
+*/
+
+/**
+* The total width or height of a cellular automaton in number of cells.
+* Specifically, a whole number greater than or equal to one.
+* @typedef {number} GridDimension
+*/
+
+/**
+* A valid cell state, i.e. a boolean, a number, or a string.
+* @typedef {(boolean|number|string)} CellState
+*/
+
+//
+//=== Define Callbacks ========================================================
+//
+
+/**
+ * A step function is used to calcualte the next value of each cell for each
+ * step the cellular automaton takes.
+ *
+ * @callback stepFunction
+ * @param {CellState} currentState - the curent state of the cell.
+ * @param {CellState[]} neighbourStates - the current state of each
+ * neighbouring cell as an array with the cell at 12 o'clock at index zero, and
+ * moving around the cell clockwise from there. If a cell is on an edge, there
+ * will still be array elements representing the non-existent neighbours, but
+ * they will have the valye `null`.
+ * @returns {CellState} the next state for the cell.
+ */
+
+/**
+ * A render function should style a table data cell so it represents a given
+ * state. This function will be used to render each cell in a cellular
+ * automaton.
+ *
+ * @callback renderFunction
+ * @param {jQuerySingleTD} rFn - a jQuery object representing the table data
+ * cell to be rendered.
+ * @param {CellState} s - the state of the cell the table data cell represents.
+ */
+
+/**
+ * An initialisation function is used to set the initial states of each cell in
+ * a cellular automaton. The function will be called once for each cell, and it
+ * will return an initial state for each.
+ *
+ * @callback initialisationFunction
+ * @param {GridCoordinate} x - the zero-indexed X-coordinate of the cell being
+ * initialised within the cellular automaton's grid.
+ * @param {GridCoordinate} y - the zero-indexed Y-coordinate of the cell being
+ * initialised within the cellular automaton's grid.
+ * @returns {CellState} an initial state.
+ */

@@ -1125,6 +1125,38 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                 a.deepEqual(ca.cellNeighbourStates(4, 3), [15, null, null, null, null, null, 19, 14], 'bottom-right corner OK');
                 a.deepEqual(ca.cellNeighbourStates(0, 3), [11, 12, 17, null, null, null, null, null], 'bottom-left corner OK');
             });
+            QUnit.test('.step()', function(a){
+                a.expect(1);
+                
+                // create a CA with a step function that increments the state by 1
+                var stateArrayPre = [
+                    [1,  6, 11, 16, 21],
+                    [2,  7, 12, 17, 22],
+                    [3,  8, 13, 18, 23],
+                    [4,  9, 14, 19, 24],
+                    [5, 10, 15, 20, 25]
+                ];
+                var stateArrayPost = [
+                    [2,  7, 12, 17, 22],
+                    [3,  8, 13, 18, 23],
+                    [4,  9, 14, 19, 24],
+                    [5, 10, 15, 20, 25],
+                    [6, 11, 16, 21, 26]
+                ];
+                var ca = new bartificer.ca.Automaton($('<div></div>'), 5, 5, function(s){ return s + 1; }, function(){ }, stateArrayPre);
+                
+                // step the CA
+                ca.step();
+                
+                // make sure each state was incremented by 1
+                var allOK = true;
+                for(var x = 0; x < 5; x++){
+                    for(var y = 0; y < 5; y++){
+                        if(ca.cellState(x, y) !== stateArrayPost[x][y]) allOK = false;
+                    }
+                }
+                a.ok(allOK, 'all cells were stepped correctly');
+            });
         }
     );
     

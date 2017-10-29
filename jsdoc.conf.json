@@ -1,9 +1,10 @@
 {
     "source" : {
-        "include": ["./lib/bartificer.ca.js"]
+        "include": ["docs-globals.jsdoc", "./lib/bartificer.ca.js"]
     },
     "opts" : {
         "destination" : "./docs",
+        "readme" : "README.md",
         "template": "./node_modules/@bbusschots/minami-bartificer"
     },
     "templates" : {
