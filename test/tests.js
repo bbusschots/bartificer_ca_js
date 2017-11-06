@@ -498,7 +498,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         });
         
         QUnit.test('argument processing', function(a){
-            a.expect(15);
+            a.expect(17);
             
             // make sure required arguments are indeed required
             a.throws(
@@ -589,6 +589,10 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                 }
             }
             a.ok(allCellsOK, 'Initialisation function correctly applied to all cells');
+            
+            // make sure the auto-step variables initialise to the expected default values
+            a.strictEqual(ca1._autoStepID, 0, 'auto step timout ID initialised to zero');
+            a.strictEqual(ca1._autoStepMS, 500, 'auto step timout initialised to 500MS');
         });
         
         QUnit.test('$container validation', function(a){
@@ -1206,5 +1210,63 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             }
         }
         a.ok(allCellsOK, 'Initialisation function correctly applied to all cells');
+    });
+    
+    QUnit.test('.autoStepIntervalMS()', function(a){
+        var mustThrow = dummyBasicTypesExcept('num');
+        a.expect(7 + mustThrow.length);
+            
+        var ca = new bartificer.ca.Automaton($('<div></div>'), 5, 5, function(s){ return s + 1; }, function(){ });
+            
+        // make sure the accessor exists
+        a.strictEqual(typeof ca.autoStepIntervalMS, 'function', 'function exists');
+            
+        // check that the getter fetches the default value
+        a.strictEqual(ca.autoStepIntervalMS(), 500, 'get mode returns expected default value');
+            
+        // set a new valid interval and make sure we get it back
+        a.strictEqual(ca.autoStepIntervalMS(100), 100, 'successfully set a new interval');
+            
+        // make sure all the disalowed basic types throw an error
+        mustThrow.forEach(function(tn){
+            var t = DUMMY_BASIC_TYPES[tn];
+            a.throws(
+                function(){
+                    ca.autoStepIntervalMS(t);
+                },
+                TypeError,
+                'interval cannot be ' + t.desc
+            );
+        });
+        
+        // make sure non-integers throw an error
+        a.throws(
+            function(){
+                ca.autoStepIntervalMS(Math.PI);
+            },
+            TypeError,
+            'interval cannot be a non-integer'
+        );
+        
+        // make sure negative numbers throw an error
+        a.throws(
+            function(){
+                ca.autoStepIntervalMS(-1);
+            },
+            TypeError,
+            'interval cannot be negative'
+        );
+        
+        // make sure zero throws an error
+        a.throws(
+            function(){
+                ca.autoStepIntervalMS(0);
+            },
+            TypeError,
+            'interval cannot be zero'
+        );
+        
+        // make sure one doesn't throw an error
+        a.ok(ca.autoStepIntervalMS(1), 'interval can be one');
     });
 });
