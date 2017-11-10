@@ -75,6 +75,14 @@
             $('#step1_btn').click(function(){
                 sampleCA.step();
             });
+            
+            // add a click handler to the play and stop buttons
+            $('#start_btn').click(function(){
+                sampleCA.start();
+            });
+            $('#stop_btn').click(function(){
+                sampleCA.stop();
+            });
         });
     </script>
     
@@ -91,7 +99,11 @@
 <header><h1>A Sample Cellular Automaton - Conway's Game of Life</h1></header>
 <main>
     <form action="javascript:void(0);">
-    <p><button type="button" id="step1_btn">Step Forward 1x</button></p>
+    <nav>
+        <button type="button" id="step1_btn">Step Forward 1x</button>
+        <button type="button" id="start_btn">Start Auto Run</button>
+        <button type="button" id="stop_btn">Stop Auto Run</button>
+    </nav>
     </form>
     <div id="game_of_life_container"></div>
     <p>For more information on Conway's Game of Life <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life" target="_blank" rel="noopener">see this Wikipedia article</a>.</p>
