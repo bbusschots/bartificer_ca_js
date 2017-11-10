@@ -21,7 +21,7 @@
             if(s == true){
                 $td.css('background-color', 'Green');
             }else{
-                $td.css('background-color', 'Red');
+                $td.css('background-color', '#ff9999');
             }
         }
         
@@ -84,6 +84,13 @@
                 sampleCA.stop();
             });
             
+            // add a change handler to the speed slider
+            $('#speed_rng').change(function(){
+                var fps = $(this).val(); // read the frames per sec from the slider
+                var ms = Math.round(1000 / fps); // convert fps to milliseconds delay
+                sampleCA.autoStepIntervalMS(ms); // save the new step into the CA
+            }).change();
+            
             // add a generation change event handler to update the counter
             sampleCA.generationChange(function(){
                 $('#game_of_life_generation > tt').text(sampleCA.generation());
@@ -94,6 +101,11 @@
     <!-- Stype the Automaton -->
     <style type="text/css">
         /* style the cells in the automaton */
+        table.bartificer-ca-automaton{
+            border-collapse: collapse;
+            border: 1px solid black;
+            margin: 3px;
+        }
         td.bartificer-ca-cell{
             width: 10px;
             height: 10px;
@@ -113,6 +125,7 @@
         <button type="button" id="step1_btn">Step Forward 1x</button>
         <button type="button" id="start_btn">Start Auto Run</button>
         <button type="button" id="stop_btn">Stop Auto Run</button>
+        <label>Speed <input type="range" id="speed_rng" min=1 max=10 step="0.01"></label>
         <label id="game_of_life_generation">Generation: <tt></tt></label>
     </nav>
     </form>
