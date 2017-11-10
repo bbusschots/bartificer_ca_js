@@ -83,6 +83,11 @@
             $('#stop_btn').click(function(){
                 sampleCA.stop();
             });
+            
+            // add a generation change event handler to update the counter
+            sampleCA.generationChange(function(){
+                $('#game_of_life_generation > tt').text(sampleCA.generation());
+            }).generationChange();
         });
     </script>
     
@@ -92,6 +97,11 @@
         td.bartificer-ca-cell{
             width: 10px;
             height: 10px;
+        }
+        
+        /* position the generation counter */
+        #game_of_life_generation{
+            float: right;
         }
     </style>
 </head>
@@ -103,6 +113,7 @@
         <button type="button" id="step1_btn">Step Forward 1x</button>
         <button type="button" id="start_btn">Start Auto Run</button>
         <button type="button" id="stop_btn">Stop Auto Run</button>
+        <label id="game_of_life_generation">Generation: <tt></tt></label>
     </nav>
     </form>
     <div id="game_of_life_container"></div>

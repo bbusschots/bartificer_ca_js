@@ -498,7 +498,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         });
         
         QUnit.test('argument processing', function(a){
-            a.expect(18);
+            a.expect(19);
             
             // make sure required arguments are indeed required
             a.throws(
@@ -541,7 +541,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             a.ok(new bartificer.ca.Automaton($('<div></div>'), 10, 10, function(){}, function(){}), "valid arguments don't throw error");
             
             // make sure optional arguments are allowed
-            a.ok(new bartificer.ca.Automaton($('<div></div>'), 10, 10, function(){}, function(){}, true), 'presence of optional sixth argument does not trow an error');
+            a.ok(new bartificer.ca.Automaton($('<div></div>'), 10, 10, function(){}, function(){}, true), 'presence of optional sixth argument does not throw an error');
             
             // make sure all values passed are properly stored
             var $div = $('<div></div>');
@@ -592,6 +592,9 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             
             // make sure the generation counter initialise to the expected initial value
             a.strictEqual(ca1._generation, 0, 'generation counter initialised to zero');
+            
+            // make sure the generation change event handler array initialised correctly
+            a.deepEqual(ca1._generationChange, [], 'generation change event handler list initialised to empty array');
             
             // make sure the auto-step variables initialise to the expected default values
             a.strictEqual(ca1._autoStepID, 0, 'auto step timout ID initialised to zero');
@@ -1202,6 +1205,60 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         
         // make sure the counter was re-set to zero
          a.strictEqual(ca.generation(), 0, 'Setting new state re-sets the generation to zero');
+    });
+    
+    QUnit.test('Generation Change Event Handling', function(a){
+        var mustThrow = dummyBasicTypesExcept('fn', 'undef');
+        a.expect(mustThrow.length + 8);
+        
+        var ca = new bartificer.ca.Automaton($('<div></div>'), 3, 3, function(){ return true; }, function(){}, true);
+        
+        // make sure the function exists
+        a.ok(typeof ca.generationChange === 'function', 'the .generationChange() function exists');
+        
+        // make sure running the function with no parameters when there are no registered handlers does not throw an error
+        a.ok(ca.generationChange(), 'execution when no handlers are added does not throw an error');
+        
+        // make sure adding handlers works
+        var cb1Execed = false;
+        var cb2Execed = false;
+        var cb1 = function(){ cb1Execed = true; };
+        var cb2 = function(){ cb2Execed = true; };
+        ca.generationChange(cb1);
+        ca.generationChange(cb2);
+        a.deepEqual(ca._generationChange, [cb1, cb2], 'callbacks successfully registered');
+        
+        // check parameter validation
+        mustThrow.forEach(function(tn){
+            var t = DUMMY_BASIC_TYPES[tn];
+            a.throws(
+                function(){
+                    ca.generationChange(t.val);
+                },
+                TypeError,
+                "generation change callback can't be " + t.desc
+            );
+        });
+        
+        // make sure direct execution of all callbacks works
+        ca.generationChange();
+        a.ok(cb1Execed && cb2Execed, 'direct execution of generation change callbacks works as expected');
+        
+        // make sure execution via the step function works
+        cb1Execed = false;
+        cb2Execed = false;
+        ca.step();
+        a.ok(cb1Execed && cb2Execed, '.step() calls the generation change callbacks');
+        
+        // make sure execution via .setState() works
+        cb1Execed = false;
+        cb2Execed = false;
+        ca.setState(true);
+        a.ok(cb1Execed && cb2Execed, '.setState() calls the generation change callbacks');
+        
+        // make sure a reference to self is returne for function chaining
+        a.strictEqual(ca.generationChange(), ca, 'returns reference to self when executing registered callbacks');
+        a.strictEqual(ca.generationChange(function(){}), ca, 'returns reference to self when adding a callback');
     });
     
     QUnit.test('.setState()', function(a){
