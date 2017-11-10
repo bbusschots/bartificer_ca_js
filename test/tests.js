@@ -498,7 +498,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         });
         
         QUnit.test('argument processing', function(a){
-            a.expect(17);
+            a.expect(18);
             
             // make sure required arguments are indeed required
             a.throws(
@@ -589,6 +589,9 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                 }
             }
             a.ok(allCellsOK, 'Initialisation function correctly applied to all cells');
+            
+            // make sure the generation counter initialise to the expected initial value
+            a.strictEqual(ca1._generation, 0, 'generation counter initialised to zero');
             
             // make sure the auto-step variables initialise to the expected default values
             a.strictEqual(ca1._autoStepID, 0, 'auto step timout ID initialised to zero');
@@ -1079,6 +1082,22 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                     'attempt to set throws error'
                 );
             });
+            QUnit.test('.generation()', function(a){
+                a.expect(3);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.generation, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                a.strictEqual(this.ca1.generation(), 0, 'returns the expected value');
+                
+                // make sure attempts to set a value throw an Error
+                a.throws(
+                    function(){ this.ca1.generation(5); },
+                    Error,
+                    'attempt to set throws error'
+                );
+            });
             QUnit.test('.cell()', function(a){
                 a.expect(2);
             
@@ -1163,6 +1182,27 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             });
         }
     );
+    
+    QUnit.test('Generation Counting', function(a){
+        a.expect(3);
+        
+        var ca = new bartificer.ca.Automaton($('<div></div>'), 3, 3, function(){ return true; }, function(){}, true);
+        
+        // make sure the count starts at zero
+        a.strictEqual(ca.generation(), 0, 'Automaton starts at generation zero');
+        
+        // step forward three times
+        ca.step().step().step();
+        
+        // make sure the generation is now three
+        a.strictEqual(ca.generation(), 3, 'generation correctly incremented');
+        
+        // set to a new state
+        ca.setState(true);
+        
+        // make sure the counter was re-set to zero
+         a.strictEqual(ca.generation(), 0, 'Setting new state re-sets the generation to zero');
+    });
     
     QUnit.test('.setState()', function(a){
         a.expect(3);
