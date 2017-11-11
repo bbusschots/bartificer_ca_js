@@ -61,7 +61,7 @@
             // use the constructor to build an automaton
             sampleCA = new bartificer.ca.Automaton(
                 $('#game_of_life_container'), // use the div as the container
-                50, 100, // make it a 100x50 grid
+                100, 200, // make it a 100x50 grid
                 lifeStep, // pass the game of life step function
                 renderRedGreen, // pass our red/green render function
                 randomBoolean // initialise each cell to a random boolean
@@ -70,6 +70,11 @@
             // log the geneated automaton object so we can have a look inside
             // it in the JavaScript console if we want
             console.log(sampleCA);
+            
+            // add a click handler to the respawn button
+            $('#respawn_btn').click(function(){
+                sampleCA.setState(randomBoolean);
+            });
             
             // add a click handler to the step button
             $('#step1_btn').click(function(){
@@ -107,13 +112,8 @@
             margin: 3px;
         }
         td.bartificer-ca-cell{
-            width: 10px;
-            height: 10px;
-        }
-        
-        /* position the generation counter */
-        #game_of_life_generation{
-            float: right;
+            width: 5px;
+            height: 5px;
         }
     </style>
 </head>
@@ -122,11 +122,12 @@
 <main>
     <form action="javascript:void(0);">
     <nav>
+        <label id="game_of_life_generation">Generation: <tt></tt></label>
+        <button type="button" id="respawn_btn">Respawn</button>
         <button type="button" id="step1_btn">Step Forward 1x</button>
         <button type="button" id="start_btn">Start Auto Run</button>
         <button type="button" id="stop_btn">Stop Auto Run</button>
         <label>Speed <input type="range" id="speed_rng" min=1 max=10 step="0.01"></label>
-        <label id="game_of_life_generation">Generation: <tt></tt></label>
     </nav>
     </form>
     <div id="game_of_life_container"></div>
