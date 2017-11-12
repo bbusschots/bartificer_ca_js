@@ -95,7 +95,17 @@
                 var ms = Math.round(1000 / fps); // convert fps to milliseconds delay
                 sampleCA.autoStepIntervalMS(ms); // save the new step into the CA
             }).change();
-            
+
+
+	        /*
+             * binding the listener is exactly the same as event handlers for the standard DOM events.
+             * .click(handlerRef) is a shortcut for .on('click', handlerRef)
+             * Be very very careful not to name events the same as functions. Causes identity issues.
+             */
+	        $(sampleCA).on('generationChanged', (evt, generation)=>{
+		        $('#game_of_life_event_generation > span').text(generation);
+            });
+
             // add a generation change event handler to update the counter
             sampleCA.generationChange(function(){
                 $('#game_of_life_generation > tt').text(sampleCA.generation());
@@ -123,6 +133,7 @@
     <form action="javascript:void(0);">
     <nav>
         <label id="game_of_life_generation">Generation: <tt></tt></label>
+        <label id="game_of_life_event_generation">Generation: <span/></label>
         <button type="button" id="respawn_btn">Respawn</button>
         <button type="button" id="step1_btn">Step Forward 1x</button>
         <button type="button" id="start_btn">Start Auto Run</button>
