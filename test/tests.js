@@ -4,8 +4,8 @@
 
 // A library of dummy data and related functions to speed up data validation
 // tests (values re-set for each test)
-var DUMMY_DATA = {};
-var DUMMY_BASIC_TYPES = {};
+let DUMMY_DATA = {};
+let DUMMY_BASIC_TYPES = {};
 QUnit.testStart(function() {
     DUMMY_DATA = {
         undef: {
@@ -78,13 +78,13 @@ QUnit.testStart(function() {
 // See Also   :
 function dummyBasicTypesExcept(){
     // build and exclusion lookup from the arguments
-    var exclude_lookup = {};
-    for(var i = 0; i < arguments.length; i++){
+    const exclude_lookup = {};
+    for(let i = 0; i < arguments.length; i++){
         exclude_lookup[arguments[i]] = true;
     }
     
     // build the list of type names not excluded
-    var ans = [];
+    const ans = [];
     Object.keys(DUMMY_BASIC_TYPES).sort().forEach(function(tn){
         if(!exclude_lookup[tn]){
             ans.push(tn); // save the type name if not excluded
@@ -124,21 +124,21 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
             // make sure required arguments are indeed required
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Cell();
+                    const c1 = new bartificer.ca.Cell();
                 },
                 TypeError,
                 'throws error when called with no arguments'
             );
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Cell($('<td></td>'));
+                    const c1 = new bartificer.ca.Cell($('<td></td>'));
                 },
                 TypeError,
                 'throws error when called without second argument'
             );
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Cell($('<td></td>'), 10);
+                    const c1 = new bartificer.ca.Cell($('<td></td>'), 10);
                 },
                 TypeError,
                 'throws error when called without third argument'
@@ -151,11 +151,11 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
             a.ok(new bartificer.ca.Cell($('<td></td>'), 0, 0, true), 'presence of optional fourth argument does not trow an error');
             
             // make sure all values passed are properly stored
-            var $td = $('<td></td>');
-            var x = 0;
-            var y = 0;
-            var s = 'boogers';
-            var c1 = new bartificer.ca.Cell($td, x, y, s);
+            const $td = $('<td></td>');
+            const x = 0;
+            const y = 0;
+            const s = 'boogers';
+            const c1 = new bartificer.ca.Cell($td, x, y, s);
             a.strictEqual(c1._$td, $td, 'the first argument ($td) was correctly stored within the object');
             a.strictEqual(c1._x, x, 'the x coordinate was correctly stored within the object');
             a.strictEqual(c1._y, y, 'the y coordinate was correctly stored within the object');
@@ -164,16 +164,16 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
         });
         
         QUnit.test('$td validation', function(a){
-            var mustThrow = dummyBasicTypesExcept('obj');
+            const mustThrow = dummyBasicTypesExcept('obj');
             
             a.expect(mustThrow.length + 4);
             
             // make sure all the basic types except object throw an error
             mustThrow.forEach(function(tn){
-                var t = DUMMY_BASIC_TYPES[tn];
+                const t = DUMMY_BASIC_TYPES[tn];
                 a.throws(
                     function(){
-                        var c1 = new bartificer.ca.Cell(t.val, 0, 0);
+                        const c1 = new bartificer.ca.Cell(t.val, 0, 0);
                     },
                     TypeError,
                     '$td cannot be ' + t.desc
@@ -183,7 +183,7 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
             // make sure an object that is not a jQuery object throws an error
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Cell(DUMMY_DATA.obj_proto.val, 0, 0);
+                    const c1 = new bartificer.ca.Cell(DUMMY_DATA.obj_proto.val, 0, 0);
                 },
                 TypeError,
                 '$td cannot be a reference to an object with a prototype other than jQuery'
@@ -192,17 +192,17 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
             // make sure an empty jQuery object is not accepted
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Cell(DUMMY_DATA.obj_jQuery_empty.val, 0, 0);
+                    const c1 = new bartificer.ca.Cell(DUMMY_DATA.obj_jQuery_empty.val, 0, 0);
                 },
                 TypeError,
                 '$td cannot be a reference to a empty jQuery object'
             );
             
             // make sure a jQuery object representing multiple elements will not be accepted
-            var $multi = $().add($('<td></td>')).add($('<td></td>'));
+            const $multi = $().add($('<td></td>')).add($('<td></td>'));
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Cell($multi, 0, 0);
+                    const c1 = new bartificer.ca.Cell($multi, 0, 0);
                 },
                 TypeError,
                 '$td cannot be a reference to a jQuery object representing multiple table data cells'
@@ -211,7 +211,7 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
             // make sure a jQuery object representing something other than a td throws an error
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Cell($('<p></p>'), 0, 0);
+                    const c1 = new bartificer.ca.Cell($('<p></p>'), 0, 0);
                 },
                 TypeError,
                 '$td cannot be a reference to a jQuery object representing a paragraph'
@@ -219,25 +219,25 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
         });
         
         QUnit.test('coordinate validation', function(a){
-            var mustThrow = dummyBasicTypesExcept('num');
+            const mustThrow = dummyBasicTypesExcept('num');
             
             a.expect((mustThrow.length * 2) + 6);
             
-            var $td = $('<td></td>');
+            const $td = $('<td></td>');
             
             // make sure all the basic types except number throw an error
             mustThrow.forEach(function(tn){
-                var t = DUMMY_BASIC_TYPES[tn];
+                const t = DUMMY_BASIC_TYPES[tn];
                 a.throws(
                     function(){
-                        var c1 = new bartificer.ca.Cell($td, t.val, 0);
+                        const c1 = new bartificer.ca.Cell($td, t.val, 0);
                     },
                     TypeError,
                     'x coordinate cannot be ' + t.desc
                 );
                 a.throws(
                     function(){
-                        var c1 = new bartificer.ca.Cell($td, 0, t.val);
+                        const c1 = new bartificer.ca.Cell($td, 0, t.val);
                     },
                     TypeError,
                     'y coordinate cannot be ' + t.desc
@@ -247,14 +247,14 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
             // make sure negative numbers throw an error
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Cell($td, -1, 0);
+                    const c1 = new bartificer.ca.Cell($td, -1, 0);
                 },
                 TypeError,
                 'x coordinate cannot be negative'
             );
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Cell($td, 0, -1);
+                    const c1 = new bartificer.ca.Cell($td, 0, -1);
                 },
                 TypeError,
                 'y coordinate cannot be negative'
@@ -263,14 +263,14 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
             // make sure decimal numbers throw an error
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Cell($td, Math.PI, 0);
+                    const c1 = new bartificer.ca.Cell($td, Math.PI, 0);
                 },
                 TypeError,
                 'x coordinate cannot be a non-integer number'
             );
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Cell($td, 0, Math.PI);
+                    const c1 = new bartificer.ca.Cell($td, 0, Math.PI);
                 },
                 TypeError,
                 'y coordinate cannot be a non-integer number'
@@ -287,10 +287,10 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
             a.expect(2);
             
             // create a table data cell
-            var $td = $('<td></td>');
+            const $td = $('<td></td>');
             
             // create a Cell
-            var c1 = new bartificer.ca.Cell($td, 0, 0);
+            const c1 = new bartificer.ca.Cell($td, 0, 0);
             
             // make sure the expect class was added
             a.ok($td.hasClass('bartificer-ca-cell'), "the class 'bartificer-ca-cell' was added");
@@ -300,12 +300,12 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
         });
         
         QUnit.test('reinitialisation prevented', function(a){
-            var $td = $('<td></td>');
-            var c1 = new bartificer.ca.Cell($td, 0, 0);
+            const $td = $('<td></td>');
+            const c1 = new bartificer.ca.Cell($td, 0, 0);
             
             // make sure an error is thrown if there is an attempt to re-use the same TD
             a.throws(
-                function(){ var c2 = new bartificer.ca.Cell($td, 0, 1); },
+                function(){ const c2 = new bartificer.ca.Cell($td, 0, 1); },
                 Error,
                 'an error is thrown if an attempt is made to use the same table data cell for a second Cell object'
             );
@@ -399,15 +399,15 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
         QUnit.test('.state()', function(a){
             a.expect(4);
             
-            var s = 'boogers';
-            var c1 = new bartificer.ca.Cell($('<td></td>'), 0, 0, s);
+            const s = 'boogers';
+            const c1 = new bartificer.ca.Cell($('<td></td>'), 0, 0, s);
             
             // make sure the accessor exists
             a.strictEqual(typeof c1.state, 'function', 'function exists');
             
             // make sure the accessor reads correctly
             a.strictEqual(c1.state(), s, 'returns the expected value when the cell has a current state');
-            var c2 = new bartificer.ca.Cell($('<td></td>'), 0, 0);
+            const c2 = new bartificer.ca.Cell($('<td></td>'), 0, 0);
             a.strictEqual(c2.state(), undefined, 'returns undefined value when the cell has no current state');
             
             // make sure attempts to set a value throw an Error
@@ -421,8 +421,8 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
         QUnit.test('.nextState()', function(a){
             a.expect(5);
             
-            var s = 'boogers';
-            var c1 = new bartificer.ca.Cell($('<td></td>'), 0, 0);
+            const s = 'boogers';
+            const c1 = new bartificer.ca.Cell($('<td></td>'), 0, 0);
             
             // make sure the accessor exists
             a.strictEqual(typeof c1.nextState, 'function', 'function exists');
@@ -443,7 +443,7 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
         QUnit.test('.hasNextState()', function(a){
             a.expect(3);
             
-            var c1 = new bartificer.ca.Cell($('<td></td>'), 0, 0);
+            const c1 = new bartificer.ca.Cell($('<td></td>'), 0, 0);
             
             // make sure the function exists
             a.strictEqual(typeof c1.hasNextState, 'function', 'function exists');
@@ -459,9 +459,9 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
         QUnit.test('.advance()', function(a){
             a.expect(5);
             
-            var s1 = 'boogers';
-            var s2 = 'snot';
-            var c1 = new bartificer.ca.Cell($('<td></td>'), 0, 0, s1);
+            const s1 = 'boogers';
+            const s2 = 'snot';
+            const c1 = new bartificer.ca.Cell($('<td></td>'), 0, 0, s1);
             
             // make sure the function exists
             a.strictEqual(typeof c1.nextState, 'function', 'function exists');
@@ -503,35 +503,35 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             // make sure required arguments are indeed required
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Automaton();
+                    const c1 = new bartificer.ca.Automaton();
                 },
                 TypeError,
                 'throws error when called with no arguments'
             );
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Automaton($('<div></div>'));
+                    const c1 = new bartificer.ca.Automaton($('<div></div>'));
                 },
                 TypeError,
                 'throws error when called without second argument'
             );
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Automaton($('<div></div>'), 10);
+                    const c1 = new bartificer.ca.Automaton($('<div></div>'), 10);
                 },
                 TypeError,
                 'throws error when called without third argument'
             );
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Automaton($('<div></div>'), 10, 10);
+                    const c1 = new bartificer.ca.Automaton($('<div></div>'), 10, 10);
                 },
                 TypeError,
                 'throws error when called without fourth argument'
             );
             a.throws(
                 function(){
-                    var c1 = new bartificer.ca.Automaton($('<div></div>'), 10, 10, function(){});
+                    const c1 = new bartificer.ca.Automaton($('<div></div>'), 10, 10, function(){});
                 },
                 TypeError,
                 'throws error when called without fifth argument'
@@ -544,13 +544,13 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             a.ok(new bartificer.ca.Automaton($('<div></div>'), 10, 10, function(){}, function(){}, true), 'presence of optional sixth argument does not throw an error');
             
             // make sure all values passed are properly stored
-            var $div = $('<div></div>');
-            var r = 10;
-            var c = 10;
-            var sFn = function(){ return true; };
-            var rFn = function(){};
-            var s = true;
-            var ca1 = new bartificer.ca.Automaton($div, r, c, sFn, rFn, s);
+            const $div = $('<div></div>');
+            const r = 10;
+            const c = 10;
+            const sFn = function(){ return true; };
+            const rFn = function(){};
+            const s = true;
+            const ca1 = new bartificer.ca.Automaton($div, r, c, sFn, rFn, s);
             a.strictEqual(ca1._$container, $div, 'the container was correctly stored within the object');
             a.strictEqual(ca1._rows, r, 'the number of rows was correctly stored within the object');
             a.strictEqual(ca1._cols, c, 'the number of columns was correctly stored within the object');
@@ -558,33 +558,32 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             a.strictEqual(ca1._renderFn, rFn, 'the render function was correctly stored within the object');
             
             // make sure the optional initial state is properly applied
-            var allCellsOK = true;
-            var x, y;
-            for(x = 0; x < c && allCellsOK; x++){
-                for(y = 0; y < r; y++){
+            let allCellsOK = true;
+            for(let x = 0; x < c && allCellsOK; x++){
+                for(let y = 0; y < r; y++){
                     if(ca1.cell(x, y).state() !== s) allCellsOK = false;
                 }
             }
             a.ok(allCellsOK, 'single initial state correctly applied to all cells');
-            var initStates = [
+            const initStates = [
                 [1, 2, 3],
                 [4, 5, 6],
                 [7, 8, 8]
             ];
-            var ca2 = new bartificer.ca.Automaton($('<div></div>'), 3, 3, sFn, rFn, initStates);
+            const ca2 = new bartificer.ca.Automaton($('<div></div>'), 3, 3, sFn, rFn, initStates);
             allCellsOK = true;
-            for(x = 0; x < 3 && allCellsOK; x++){
-                for(y = 0; y < 3; y++){
+            for(let x = 0; x < 3 && allCellsOK; x++){
+                for(let y = 0; y < 3; y++){
                     if(ca2.cell(x, y).state() !== initStates[x][y]) allCellsOK = false;
                 }
             }
             a.ok(allCellsOK, '2D array of initial states correctly applied to all cells');
-            var ca3 = new bartificer.ca.Automaton($('<div></div>'), 3, 3, sFn, rFn, function(x, y){
+            const ca3 = new bartificer.ca.Automaton($('<div></div>'), 3, 3, sFn, rFn, function(x, y){
                 return x + ', ' + y;
             });
             allCellsOK = true;
-            for(x = 0; x < 3 && allCellsOK; x++){
-                for(y = 0; y < 3; y++){
+            for(let x = 0; x < 3 && allCellsOK; x++){
+                for(let y = 0; y < 3; y++){
                     if(ca3.cell(x, y).state() !== x + ', ' + y) allCellsOK = false;
                 }
             }
@@ -602,17 +601,17 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         });
         
         QUnit.test('$container validation', function(a){
-            var mustThrow = dummyBasicTypesExcept('obj');
-            var okTags = ['div', 'p', 'main', 'section'];
+            const mustThrow = dummyBasicTypesExcept('obj');
+            const okTags = ['div', 'p', 'main', 'section'];
             
             a.expect(mustThrow.length + okTags.length + 4);
             
             // make sure all the basic types except object throw an error
             mustThrow.forEach(function(tn){
-                var t = DUMMY_BASIC_TYPES[tn];
+                const t = DUMMY_BASIC_TYPES[tn];
                 a.throws(
                     function(){
-                        var ca1 = new bartificer.ca.Automaton(t.val, 10, 10, function(){}, function(){});
+                        const ca1 = new bartificer.ca.Automaton(t.val, 10, 10, function(){}, function(){});
                     },
                     TypeError,
                     '$container cannot be ' + t.desc
@@ -622,7 +621,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             // make sure an object that is not a jQuery object throws an error
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton(DUMMY_DATA.obj_proto.val, 10, 10, function(){}, function(){});
+                    const ca1 = new bartificer.ca.Automaton(DUMMY_DATA.obj_proto.val, 10, 10, function(){}, function(){});
                 },
                 TypeError,
                 '$container cannot be a reference to an object with a prototype other than jQuery'
@@ -631,17 +630,17 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             // make sure an empty jQuery object is not accepted
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton(DUMMY_DATA.obj_jQuery_empty.val, 10, 10, function(){}, function(){});
+                    const ca1 = new bartificer.ca.Automaton(DUMMY_DATA.obj_jQuery_empty.val, 10, 10, function(){}, function(){});
                 },
                 TypeError,
                 '$container cannot be a reference to a empty jQuery object'
             );
             
             // make sure a jQuery object representing multiple elements will not be accepted
-            var $multi = $().add($('<div></div>')).add($('<div></div>'));
+            const $multi = $().add($('<div></div>')).add($('<div></div>'));
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton($multi, 10, 10, function(){}, function(){});
+                    const ca1 = new bartificer.ca.Automaton($multi, 10, 10, function(){}, function(){});
                 },
                 TypeError,
                 '$container cannot be a reference to a jQuery object representing multiple elements'
@@ -650,7 +649,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             // make sure a jQuery object representing something other than a td throws an error
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton($('<span></span>'), 10, 10, function(){}, function(){});
+                    const ca1 = new bartificer.ca.Automaton($('<span></span>'), 10, 10, function(){}, function(){});
                 },
                 TypeError,
                 '$container cannot be a reference to a jQuery object representing a span'
@@ -666,27 +665,27 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         });
         
         QUnit.test('grid dimension validation', function(a){
-            var mustThrow = dummyBasicTypesExcept('num');
+            const mustThrow = dummyBasicTypesExcept('num');
             
             a.expect((mustThrow.length * 2) + 8);
             
-            var $div = $('<div></div>');
-            var sFn = function(){};
-            var rFn = function(){};
+            const $div = $('<div></div>');
+            const sFn = function(){};
+            const rFn = function(){};
             
             // make sure all the basic types except number throw an error
             mustThrow.forEach(function(tn){
-                var t = DUMMY_BASIC_TYPES[tn];
+                const t = DUMMY_BASIC_TYPES[tn];
                 a.throws(
                     function(){
-                        var ca1 = new bartificer.ca.Automaton($div, t.val, 10, sFn, rFn);
+                        const ca1 = new bartificer.ca.Automaton($div, t.val, 10, sFn, rFn);
                     },
                     TypeError,
                     'number of rows cannot be ' + t.desc
                 );
                 a.throws(
                     function(){
-                        var ca1 = new bartificer.ca.Automaton($div, 10, t.val, sFn, rFn);
+                        const ca1 = new bartificer.ca.Automaton($div, 10, t.val, sFn, rFn);
                     },
                     TypeError,
                     'number of columns cannot be ' + t.desc
@@ -696,14 +695,14 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             // make sure 0 throws an error
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton($div, 0, 10, sFn, rFn);
+                    const ca1 = new bartificer.ca.Automaton($div, 0, 10, sFn, rFn);
                 },
                 TypeError,
                 'number of rows cannot be zero'
             );
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton($div, 10, 0, sFn, rFn);
+                    const ca1 = new bartificer.ca.Automaton($div, 10, 0, sFn, rFn);
                 },
                 TypeError,
                 'number of columns cannot be zero'
@@ -712,14 +711,14 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             // make sure negative numbers throw an error
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton($div, -1, 10, sFn, rFn);
+                    const ca1 = new bartificer.ca.Automaton($div, -1, 10, sFn, rFn);
                 },
                 TypeError,
                 'number of rows cannot be negative'
             );
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton($div, 10, -1, sFn, rFn);
+                    const ca1 = new bartificer.ca.Automaton($div, 10, -1, sFn, rFn);
                 },
                 TypeError,
                 'number of columns cannot be negative'
@@ -728,14 +727,14 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             // make sure decimal numbers throw an error
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton($div, Math.PI, 10, sFn, rFn);
+                    const ca1 = new bartificer.ca.Automaton($div, Math.PI, 10, sFn, rFn);
                 },
                 TypeError,
                 'number of rows cannot be a non-integer number'
             );
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton($div, 10, Math.PI, sFn, rFn);
+                    const ca1 = new bartificer.ca.Automaton($div, 10, Math.PI, sFn, rFn);
                 },
                 TypeError,
                 'number of columns cannot be a non-integer number'
@@ -749,28 +748,28 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         });
         
         QUnit.test('callback validation', function(a){
-            var mustThrow = dummyBasicTypesExcept('fn');
+            const mustThrow = dummyBasicTypesExcept('fn');
             
             a.expect(mustThrow.length * 2);
             
-            var $div = $('<div></div>');
-            var r = 10;
-            var c = 10;
-            var fn = function(){};
+            const $div = $('<div></div>');
+            const r = 10;
+            const c = 10;
+            const fn = function(){};
             
             // make sure all the basic types except number throw an error
             mustThrow.forEach(function(tn){
-                var t = DUMMY_BASIC_TYPES[tn];
+                const t = DUMMY_BASIC_TYPES[tn];
                 a.throws(
                     function(){
-                        var ca1 = new bartificer.ca.Automaton($div, r, c, t.val, fn);
+                        const ca1 = new bartificer.ca.Automaton($div, r, c, t.val, fn);
                     },
                     TypeError,
                     'step function cannot be ' + t.desc
                 );
                 a.throws(
                     function(){
-                        var ca1 = new bartificer.ca.Automaton($div, r, c, fn, t.val);
+                        const ca1 = new bartificer.ca.Automaton($div, r, c, fn, t.val);
                     },
                     TypeError,
                     'render function cannot be ' + t.desc
@@ -779,21 +778,21 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         });
         
         QUnit.test('initial state validation', function(a){
-            var mustThrow = dummyBasicTypesExcept('bool', 'num', 'str', 'arr', 'fn', 'undef');
-            var mustNotThrow = ['bool', 'num', 'str', 'fn'];
+            const mustThrow = dummyBasicTypesExcept('bool', 'num', 'str', 'arr', 'fn', 'undef');
+            const mustNotThrow = ['bool', 'num', 'str', 'fn'];
             
             a.expect(mustThrow.length + mustNotThrow.length + 4);
             
-            var r = 2;
-            var c = 2;
-            var fn = function(){};
+            const r = 2;
+            const c = 2;
+            const fn = function(){};
             
             // make sure all the disalowed basic types throw an error
             mustThrow.forEach(function(tn){
-                var t = DUMMY_BASIC_TYPES[tn];
+                const t = DUMMY_BASIC_TYPES[tn];
                 a.throws(
                     function(){
-                        var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, t.val);
+                        const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, t.val);
                     },
                     TypeError,
                     'initial state cannot be ' + t.desc
@@ -802,7 +801,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             
             // make sure allowed basic types don't throw (except array which is a little more complex)
             mustNotThrow.forEach(function(tn){
-                var t = DUMMY_BASIC_TYPES[tn];
+                const t = DUMMY_BASIC_TYPES[tn];
                 a.ok(
                     new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, t.val),
                     'initial state can be ' + t.desc
@@ -812,14 +811,14 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             // make sure arrays of the wrong dimension throw
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, [true, true, true]);
+                    const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, [true, true, true]);
                 },
                 TypeError,
                 'initial state cannot be a 1D array'
             );
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, [[true], [true], [true]]);
+                    const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, [[true], [true], [true]]);
                 },
                 TypeError,
                 'initial state cannot be a 2D array of the wrong dimensions'
@@ -828,7 +827,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             // make sure arrays containing even one invalid value throw
             a.throws(
                 function(){
-                    var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, [[true, true], [[], true]]);
+                    const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, [[true, true], [[], true]]);
                 },
                 TypeError,
                 'initial state cannot be a 2D array of the correct dimension containing an invalid value'
@@ -842,21 +841,17 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         });
         
         QUnit.test('grid was correctly initialised', function(a){
-            var r = 2;
-            var c = 2;
-            var fn = function(){};
+            const r = 2;
+            const c = 2;
+            const fn = function(){};
             a.expect(5);
             
             // build a sample CA
-            var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, true);
-            
-            // looping variables
-            var x;
-            var y;
+            const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, true);
             
             // make sure the grid has the right shape
-            var shapeOK = true;
-            for(x = 0; x < c && shapeOK; x++){
+            let shapeOK = true;
+            for(let x = 0; x < c && shapeOK; x++){
                 // make sure top-level element is an array
                 if($.isArray(ca1._grid[x])){
                     if(!ca1._grid[x].length === c){
@@ -872,9 +867,9 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             }
             
             // make sure each element in the grid is a cell
-            var allCellProtosOK = true;
-            for(x = 0; x < c && allCellProtosOK; x++){
-                for(y = 0; y < r && allCellProtosOK; y++){
+            let allCellProtosOK = true;
+            for(let x = 0; x < c && allCellProtosOK; x++){
+                for(let y = 0; y < r && allCellProtosOK; y++){
                     if(!(ca1._grid[x][y] instanceof bartificer.ca.Cell)){
                         allCellProtosOK = false;
                     }
@@ -886,9 +881,9 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             }
             
             // check initialisation with single state
-            var singleStateOK = true;
-            for(x = 0; x < c && singleStateOK; x++){
-                for(y = 0; y < r && singleStateOK; y++){
+            let singleStateOK = true;
+            for(let x = 0; x < c && singleStateOK; x++){
+                for(let y = 0; y < r && singleStateOK; y++){
                     if(ca1._grid[x][y].state() !== true){
                         singleStateOK = false;
                     }
@@ -897,11 +892,11 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             a.ok(singleStateOK, 'All cells in CA created with single-value initial state have the expected state');
             
             // check initialation with array of states
-            var stateArray = [['1', '2'], ['3', '4']];
-            var ca2 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, stateArray);
-            var stateArrayOK = true;
-            for(x = 0; x < c && stateArrayOK; x++){
-                for(y = 0; y < r && stateArrayOK; y++){
+            const stateArray = [['1', '2'], ['3', '4']];
+            const ca2 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, stateArray);
+            let stateArrayOK = true;
+            for(let x = 0; x < c && stateArrayOK; x++){
+                for(let y = 0; y < r && stateArrayOK; y++){
                     if(ca2._grid[x][y].state() !== stateArray[x][y]){
                         stateArrayOK = false;
                     }
@@ -910,13 +905,13 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             a.ok(stateArrayOK, 'All cells in CA created with an array of initial states have the expected state');
             
             // check initialisation with function
-            var stateCB = function(x, y){
+            const stateCB = function(x, y){
                 return 'x=' + x + ' & y=' + y;
             };
-            var ca3 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, stateCB);
-            var stateCBOK = true;
-            for(x = 0; x < c && stateCBOK; x++){
-                for(y = 0; y < r && stateCBOK; y++){
+            const ca3 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, stateCB);
+            let stateCBOK = true;
+            for(let x = 0; x < c && stateCBOK; x++){
+                for(let y = 0; y < r && stateCBOK; y++){
                     if(ca3._grid[x][y].state() !== stateCB(x, y)){
                         stateCBOK = false;
                     }
@@ -927,10 +922,10 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         
         QUnit.test('table was correctly generated', function(a){
             a.expect(2);
-            var r = 4;
-            var c = 4;
-            var fn = function(){};
-            var ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn);
+            const r = 4;
+            const c = 4;
+            const fn = function(){};
+            const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn);
             a.equal($('table', ca1.$container()).length, 1, 'exactly one table in container');
             a.equal($('td', ca1.$container()).length, r * c, 'correct number of table data cells in container');
         });
@@ -938,13 +933,13 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         QUnit.test('check DOM alterations', function(a){
             a.expect(4);
             
-            var $div = $('<div></div>');
-            var r = 4;
-            var c = 4;
-            var fn = function(){};
+            const $div = $('<div></div>');
+            const r = 4;
+            const c = 4;
+            const fn = function(){};
             
             // create an automaton
-            var ca1 = new bartificer.ca.Automaton($div, r, c, fn, fn);
+            const ca1 = new bartificer.ca.Automaton($div, r, c, fn, fn);
             
             // make sure the expect class was added to the container & table
             a.ok($div.hasClass('bartificer-ca-container'), "the class 'bartificer-ca-container' was added to the container");
@@ -956,15 +951,15 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         });
         
         QUnit.test('reinitialisation prevented', function(a){
-            var $div = $('<div></div>');
-            var r = 4;
-            var c = 4;
-            var fn = function(){};
-            var ca1 = new bartificer.ca.Automaton($div, r, c, fn, fn);
+            const $div = $('<div></div>');
+            const r = 4;
+            const c = 4;
+            const fn = function(){};
+            const ca1 = new bartificer.ca.Automaton($div, r, c, fn, fn);
             
             // make sure an error is thrown if there is an attempt to re-use the same div
             a.throws(
-                function(){ var c2 = new bartificer.ca.Automaton($div, r, c, fn, fn); },
+                function(){ const c2 = new bartificer.ca.Automaton($div, r, c, fn, fn); },
                 Error,
                 'an error is thrown if an attempt is made to use the same div for a second Automaton object'
             );
@@ -1117,8 +1112,8 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                 a.strictEqual(typeof this.ca1.cellState, 'function', 'function exists');
             
                 // make sure the accessor returns the correct value
-                var initStates = [[1, 2], [3, 4]];
-                var ca2 = new bartificer.ca.Automaton($('<div></div>'), 2, 2, this.sFn, this.rFn, initStates);
+                const initStates = [[1, 2], [3, 4]];
+                const ca2 = new bartificer.ca.Automaton($('<div></div>'), 2, 2, this.sFn, this.rFn, initStates);
                 a.strictEqual(ca2.cellState(0, 1), initStates[0][1], 'returns the expected value');
             });
             QUnit.test('.cellNeighbourStates()', function(a){
@@ -1128,7 +1123,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                 a.strictEqual(typeof this.ca1.cellNeighbourStates, 'function', 'function exists');
                 
                 // build a CA to test against
-                var stateArray = [
+                const stateArray = [
                     [1,  6, 11, 16],
                     [2,  7, 12, 17],
                     [3,  8, 13, 18],
@@ -1140,7 +1135,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                 //  6  7  8  9 10
                 // 11 12 13 14 15
                 // 16 17 18 19 20
-                var ca = new bartificer.ca.Automaton($('<div></div>'), 4, 5, this.sFn, this.rFn, stateArray);
+                const ca = new bartificer.ca.Automaton($('<div></div>'), 4, 5, this.sFn, this.rFn, stateArray);
                 
                 // check an internal cell
                 a.deepEqual(ca.cellNeighbourStates(3, 2), [9, 10, 15, 20, 19, 18, 13, 8], 'internal cell OK');
@@ -1155,29 +1150,29 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                 a.expect(1);
                 
                 // create a CA with a step function that increments the state by 1
-                var stateArrayPre = [
+                const stateArrayPre = [
                     [1,  6, 11, 16, 21],
                     [2,  7, 12, 17, 22],
                     [3,  8, 13, 18, 23],
                     [4,  9, 14, 19, 24],
                     [5, 10, 15, 20, 25]
                 ];
-                var stateArrayPost = [
+                const stateArrayPost = [
                     [2,  7, 12, 17, 22],
                     [3,  8, 13, 18, 23],
                     [4,  9, 14, 19, 24],
                     [5, 10, 15, 20, 25],
                     [6, 11, 16, 21, 26]
                 ];
-                var ca = new bartificer.ca.Automaton($('<div></div>'), 5, 5, function(s){ return s + 1; }, function(){ }, stateArrayPre);
+                const ca = new bartificer.ca.Automaton($('<div></div>'), 5, 5, function(s){ return s + 1; }, function(){ }, stateArrayPre);
                 
                 // step the CA
                 ca.step();
                 
                 // make sure each state was incremented by 1
-                var allOK = true;
-                for(var x = 0; x < 5; x++){
-                    for(var y = 0; y < 5; y++){
+                let allOK = true;
+                for(let x = 0; x < 5; x++){
+                    for(let y = 0; y < 5; y++){
                         if(ca.cellState(x, y) !== stateArrayPost[x][y]) allOK = false;
                     }
                 }
@@ -1189,7 +1184,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
     QUnit.test('Generation Counting', function(a){
         a.expect(3);
         
-        var ca = new bartificer.ca.Automaton($('<div></div>'), 3, 3, function(){ return true; }, function(){}, true);
+        const ca = new bartificer.ca.Automaton($('<div></div>'), 3, 3, function(){ return true; }, function(){}, true);
         
         // make sure the count starts at zero
         a.strictEqual(ca.generation(), 0, 'Automaton starts at generation zero');
@@ -1208,10 +1203,10 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
     });
     
     QUnit.test('Generation Change Event Handling', function(a){
-        var mustThrow = dummyBasicTypesExcept('fn', 'undef');
+        const mustThrow = dummyBasicTypesExcept('fn', 'undef');
         a.expect(mustThrow.length + 8);
         
-        var ca = new bartificer.ca.Automaton($('<div></div>'), 3, 3, function(){ return true; }, function(){}, true);
+        const ca = new bartificer.ca.Automaton($('<div></div>'), 3, 3, function(){ return true; }, function(){}, true);
         
         // make sure the function exists
         a.ok(typeof ca.generationChange === 'function', 'the .generationChange() function exists');
@@ -1220,17 +1215,17 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         a.ok(ca.generationChange(), 'execution when no handlers are added does not throw an error');
         
         // make sure adding handlers works
-        var cb1Execed = false;
-        var cb2Execed = false;
-        var cb1 = function(){ cb1Execed = true; };
-        var cb2 = function(){ cb2Execed = true; };
+        let cb1Execed = false;
+        let cb2Execed = false;
+        const cb1 = function(){ cb1Execed = true; };
+        const cb2 = function(){ cb2Execed = true; };
         ca.generationChange(cb1);
         ca.generationChange(cb2);
         a.deepEqual(ca._generationChange, [cb1, cb2], 'callbacks successfully registered');
         
         // check parameter validation
         mustThrow.forEach(function(tn){
-            var t = DUMMY_BASIC_TYPES[tn];
+            const t = DUMMY_BASIC_TYPES[tn];
             a.throws(
                 function(){
                     ca.generationChange(t.val);
@@ -1263,34 +1258,33 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
     
     QUnit.test('.setState()', function(a){
         a.expect(3);
-        var $div = $('<div></div>');
-        var r = 3;
-        var c = 3;
-        var sFn = function(){ return true; };
-        var rFn = function(){};
-        var allCellsOK = true;
-        var x, y;
-        var ca = new bartificer.ca.Automaton($div, r, c, sFn, rFn, true);
+        const $div = $('<div></div>');
+        const r = 3;
+        const c = 3;
+        const sFn = function(){ return true; };
+        const rFn = function(){};
+        let allCellsOK = true;
+        const ca = new bartificer.ca.Automaton($div, r, c, sFn, rFn, true);
         
         // test when given a single state
         ca.setState('boogers');
-        for(x = 0; x < c && allCellsOK; x++){
-            for(y = 0; y < r; y++){
+        for(let x = 0; x < c && allCellsOK; x++){
+            for(let y = 0; y < r; y++){
                 if(ca.cell(x, y).state() !== 'boogers') allCellsOK = false;
             }
         }
         a.ok(allCellsOK, 'single initial state correctly applied to all cells');
         
         // test when given a grid of states
-        var initStates = [
+        const initStates = [
             [1, 2, 3],
             [4, 5, 6],
             [7, 8, 8]
         ];
         ca.setState(initStates);
         allCellsOK = true;
-        for(x = 0; x < c && allCellsOK; x++){
-            for(y = 0; y < r; y++){
+        for(let x = 0; x < c && allCellsOK; x++){
+            for(let y = 0; y < r; y++){
                 if(ca.cell(x, y).state() !== initStates[x][y]) allCellsOK = false;
             }
         }
@@ -1301,8 +1295,8 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             return x + ', ' + y;
         });
         allCellsOK = true;
-        for(x = 0; x < 3 && allCellsOK; x++){
-            for(y = 0; y < 3; y++){
+        for(let x = 0; x < 3 && allCellsOK; x++){
+            for(let y = 0; y < 3; y++){
                 if(ca.cell(x, y).state() !== x + ', ' + y) allCellsOK = false;
             }
         }
@@ -1310,10 +1304,10 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
     });
     
     QUnit.test('.autoStepIntervalMS()', function(a){
-        var mustThrow = dummyBasicTypesExcept('num');
+        const mustThrow = dummyBasicTypesExcept('num');
         a.expect(7 + mustThrow.length);
             
-        var ca = new bartificer.ca.Automaton($('<div></div>'), 5, 5, function(s){ return s + 1; }, function(){ });
+        const ca = new bartificer.ca.Automaton($('<div></div>'), 5, 5, function(s){ return s + 1; }, function(){ });
             
         // make sure the accessor exists
         a.strictEqual(typeof ca.autoStepIntervalMS, 'function', 'function exists');
@@ -1326,7 +1320,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             
         // make sure all the disalowed basic types throw an error
         mustThrow.forEach(function(tn){
-            var t = DUMMY_BASIC_TYPES[tn];
+            const t = DUMMY_BASIC_TYPES[tn];
             a.throws(
                 function(){
                     ca.autoStepIntervalMS(t);
