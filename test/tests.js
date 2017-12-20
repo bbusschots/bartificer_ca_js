@@ -176,7 +176,7 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
                         const c1 = new bartificer.ca.Cell(t.val, 0, 0);
                     },
                     TypeError,
-                    '$td cannot be ' + t.desc
+                    `$td cannot be ${t.desc}`
                 );
             });
             
@@ -233,14 +233,14 @@ QUnit.module('bartificer.ca.Cell prototype', {}, function(){
                         const c1 = new bartificer.ca.Cell($td, t.val, 0);
                     },
                     TypeError,
-                    'x coordinate cannot be ' + t.desc
+                    `x coordinate cannot be ${t.desc}`
                 );
                 a.throws(
                     function(){
                         const c1 = new bartificer.ca.Cell($td, 0, t.val);
                     },
                     TypeError,
-                    'y coordinate cannot be ' + t.desc
+                    `y coordinate cannot be ${t.desc}`
                 );
             });
             
@@ -579,12 +579,12 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             }
             a.ok(allCellsOK, '2D array of initial states correctly applied to all cells');
             const ca3 = new bartificer.ca.Automaton($('<div></div>'), 3, 3, sFn, rFn, function(x, y){
-                return x + ', ' + y;
+                return `${x}, ${y}`;
             });
             allCellsOK = true;
             for(let x = 0; x < 3 && allCellsOK; x++){
                 for(let y = 0; y < 3; y++){
-                    if(ca3.cell(x, y).state() !== x + ', ' + y) allCellsOK = false;
+                    if(ca3.cell(x, y).state() !== `${x}, ${y}`) allCellsOK = false;
                 }
             }
             a.ok(allCellsOK, 'Initialisation function correctly applied to all cells');
@@ -614,7 +614,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                         const ca1 = new bartificer.ca.Automaton(t.val, 10, 10, function(){}, function(){});
                     },
                     TypeError,
-                    '$container cannot be ' + t.desc
+                    `$container cannot be ${t.desc}`
                 );
             });
             
@@ -658,8 +658,8 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             // make sure each acceptable element does not throw
             okTags.forEach(function(t){
                 a.ok(
-                    new bartificer.ca.Automaton($('<' + t + '></' + t + '>'), 10, 10, function(){}, function(){}),
-                    '$container can be a ' + t
+                    new bartificer.ca.Automaton($(`<${t}></${t}>`), 10, 10, function(){}, function(){}),
+                    `$container can be a ${t}`
                 );
             });
         });
@@ -681,14 +681,14 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                         const ca1 = new bartificer.ca.Automaton($div, t.val, 10, sFn, rFn);
                     },
                     TypeError,
-                    'number of rows cannot be ' + t.desc
+                    `number of rows cannot be ${t.desc}`
                 );
                 a.throws(
                     function(){
                         const ca1 = new bartificer.ca.Automaton($div, 10, t.val, sFn, rFn);
                     },
                     TypeError,
-                    'number of columns cannot be ' + t.desc
+                    `number of columns cannot be ${t.desc}`
                 );
             });
             
@@ -765,14 +765,14 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                         const ca1 = new bartificer.ca.Automaton($div, r, c, t.val, fn);
                     },
                     TypeError,
-                    'step function cannot be ' + t.desc
+                    `step function cannot be ${t.desc}`
                 );
                 a.throws(
                     function(){
                         const ca1 = new bartificer.ca.Automaton($div, r, c, fn, t.val);
                     },
                     TypeError,
-                    'render function cannot be ' + t.desc
+                    `render function cannot be ${t.desc}`
                 );
             });
         });
@@ -795,7 +795,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                         const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, t.val);
                     },
                     TypeError,
-                    'initial state cannot be ' + t.desc
+                    `initial state cannot be ${t.desc}`
                 );
             });
             
@@ -804,7 +804,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                 const t = DUMMY_BASIC_TYPES[tn];
                 a.ok(
                     new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, t.val),
-                    'initial state can be ' + t.desc
+                    `initial state can be ${t.desc}`
                 );
             });
             
@@ -906,7 +906,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
             
             // check initialisation with function
             const stateCB = function(x, y){
-                return 'x=' + x + ' & y=' + y;
+                return `x=${x} & y=${y}`;
             };
             const ca3 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, fn, stateCB);
             let stateCBOK = true;
@@ -1231,7 +1231,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                     ca.generationChange(t.val);
                 },
                 TypeError,
-                "generation change callback can't be " + t.desc
+                `generation change callback can't be ${t.desc}`
             );
         });
         
@@ -1292,12 +1292,12 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
         
         // test when given a callback
         ca.setState(function(x, y){    
-            return x + ', ' + y;
+            return `${x}, ${y}`;
         });
         allCellsOK = true;
         for(let x = 0; x < 3 && allCellsOK; x++){
             for(let y = 0; y < 3; y++){
-                if(ca.cell(x, y).state() !== x + ', ' + y) allCellsOK = false;
+                if(ca.cell(x, y).state() !== `${x}, ${y}`) allCellsOK = false;
             }
         }
         a.ok(allCellsOK, 'Initialisation function correctly applied to all cells');
@@ -1326,7 +1326,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, function(){
                     ca.autoStepIntervalMS(t);
                 },
                 TypeError,
-                'interval cannot be ' + t.desc
+                `interval cannot be ${t.desc}`
             );
         });
         
