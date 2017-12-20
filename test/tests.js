@@ -76,12 +76,12 @@ QUnit.testStart(function() {
 // Throws     : NOTHING
 // Notes      :
 // See Also   :
-function dummyBasicTypesExcept(){
+function dummyBasicTypesExcept(...excludeTypes){
     // build and exclusion lookup from the arguments
     const exclude_lookup = {};
-    for(let i = 0; i < arguments.length; i++){
-        exclude_lookup[arguments[i]] = true;
-    }
+    excludeTypes.forEach(function(et){
+        exclude_lookup[et] = true;
+    });
     
     // build the list of type names not excluded
     const ans = [];
