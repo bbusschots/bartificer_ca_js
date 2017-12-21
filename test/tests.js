@@ -285,7 +285,7 @@ QUnit.module('bartificer.ca.Cell prototype', {}, ()=>{
     QUnit.module(
         'read-only accessors',
         {
-            beforeEach: function(){ // NOTE!!!
+            beforeEach: function(){
                 this.$td = $('<td></td>');
                 this.x = 10;
                 this.y = 20;
@@ -293,7 +293,7 @@ QUnit.module('bartificer.ca.Cell prototype', {}, ()=>{
             }
         },
         ()=>{
-            QUnit.test('.$td()', function(a){ // NOTE!!!
+            QUnit.test('.$td()', function(a){
                 a.expect(3);
             
                 // make sure the accessor exists
