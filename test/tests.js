@@ -104,6 +104,155 @@ QUnit.test('namespace exists', (a)=>{
 });
 
 //
+// === The State Prototype ====================================================
+//
+
+QUnit.module('bartificer.ca.State prototype', {}, ()=>{
+    //
+    // --- The Constructor ---
+    //
+    QUnit.module('constructor', {}, ()=>{
+        QUnit.test('function exists', (a)=>{
+            a.strictEqual(typeof bartificer.ca.State, 'function', "has typeof 'function'");
+        });
+        
+        QUnit.test('argument processing', (a)=>{
+            a.expect(5);
+            
+            // make sure required arguments are indeed required
+            a.throws(
+                ()=>{ const s1 = new bartificer.ca.State(); },
+                TypeError,
+                'throws error when called with no arguments'
+            );
+            a.throws(
+                ()=>{ const s1 = new bartificer.ca.State(true); },
+                TypeError,
+                'throws error when called without second argument'
+            );
+            
+            // make sure valid values for all required arguments are allowed
+            a.ok(new bartificer.ca.State(true, 'alive'), "valid arguments don't throw error");
+            
+            // make sure all values passed are properly stored
+            const v = 'boogers';
+            const l = 'Boogers';
+            
+            const s1 = new bartificer.ca.State(v, l);
+            a.strictEqual(s1._value, v, 'the value was correctly stored within the object');
+            a.strictEqual(s1._label, l, 'the label was correctly stored within the object');
+        });
+        
+        QUnit.test('value validation', (a)=>{
+            const mustThrow = dummyBasicTypesExcept('bool', 'num', 'str');
+            
+            a.expect(mustThrow.length);
+            
+            // make sure all the basic types except the primitives throw an error
+            mustThrow.forEach((tn)=>{
+                const t = DUMMY_BASIC_TYPES[tn];
+                a.throws(
+                    ()=>{ const s1 = new bartificer.ca.State(t.val, 'dummy value'); },
+                    TypeError,
+                    `value cannot be ${t.desc}`
+                );
+            });
+        });
+        
+        QUnit.test('label validation', (a)=>{
+            const mustThrow = dummyBasicTypesExcept('str');
+            
+            a.expect(mustThrow.length + 1);
+            
+            // make sure all the basic types except string throw an error
+            mustThrow.forEach((tn)=>{
+                const t = DUMMY_BASIC_TYPES[tn];
+                a.throws(
+                    ()=>{ const s1 = new bartificer.ca.State(true, t.val); },
+                    TypeError,
+                    `label cannot be ${t.desc}`
+                );
+            });
+            
+            // make sure an empty string throws an error
+            a.throws(
+                ()=>{ const s1 = new bartificer.ca.State(true, ''); },
+                TypeError,
+                'label cannot be an empty string'
+            );
+        });
+    });
+    
+    QUnit.module(
+        'accessors',
+        {
+            beforeEach: function(){
+                this.v = true;
+                this.l = 'Alive';
+                this.s1 = new bartificer.ca.State(this.v, this.l);
+            }
+        },
+        ()=>{
+            QUnit.test('.value()', function(a){
+                const mustThrow = dummyBasicTypesExcept('bool', 'num', 'str');
+                
+                a.expect(mustThrow.length + 3);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.s1.value, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                a.strictEqual(this.s1.value(), this.v, 'returns the expected value');
+                
+                // make sure the new value is properly stored
+                this.s1.value(1);
+                a.strictEqual(this.s1._value, 1, 'sets the value as expected');
+                
+                // make sure attempts to set an invalid value throw a TypeError
+                mustThrow.forEach((tn)=>{
+                    const t = DUMMY_BASIC_TYPES[tn];
+                    a.throws(
+                        ()=>{ this.s1.value(t.val); },
+                        TypeError,
+                        `value cannot be set to ${t.desc}`
+                    );
+                });
+            });
+            QUnit.test('.label()', function(a){
+                const mustThrow = dummyBasicTypesExcept('str');
+                
+                a.expect(mustThrow.length + 4);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.s1.label, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                a.strictEqual(this.s1.label(), this.l, 'returns the expected value');
+                
+                // make sure the new value is properly stored
+                this.s1.label('Still Alive');
+                a.strictEqual(this.s1._label, 'Still Alive', 'sets the value as expected');
+                
+                // make sure attempts to set an invalid label throw a TypeError
+                mustThrow.forEach((tn)=>{
+                    const t = DUMMY_BASIC_TYPES[tn];
+                    a.throws(
+                        ()=>{ this.s1.label(t.val); },
+                        TypeError,
+                        `label cannot be set to ${t.desc}`
+                    );
+                });
+                a.throws(
+                    ()=>{ this.s1.label(''); },
+                    TypeError,
+                    `label cannot be set to an empty string`
+                );
+            });
+        }
+    );
+});
+
+//
 // === The Cell Prototype =====================================================
 //
 

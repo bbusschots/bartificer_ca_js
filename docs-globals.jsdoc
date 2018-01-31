@@ -20,6 +20,16 @@
 //
 
 /**
+ * A non-empty string, i.e. a string with a length of at least one.
+ * @typedef {string} NonEmptyString
+ */
+
+/**
+ * A primitive JavaScript value, i.e. a boolean, number, or string.
+ * @typedef {(boolean|number|string)} PrimitiveValue
+ */
+
+/**
 * A plain JavaScript object, i.e. an object with no prototype other than
 * `Object`.
 *
