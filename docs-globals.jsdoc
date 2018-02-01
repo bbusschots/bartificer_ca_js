@@ -72,11 +72,6 @@
 */
 
 /**
-* A valid cell state, i.e. a boolean, a number, or a string.
-* @typedef {(boolean|number|string)} CellState
-*/
-
-/**
  * A time interval as a number of milliseconds, must be a whole number greater
  * than zero.
  * @typedef {number} IntervalMS

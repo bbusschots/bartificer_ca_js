@@ -13,43 +13,48 @@
     <!-- Add the JavaScript code to initialise a Cellular Automaton -->
     <script type="text/javascript">
         // a globally scoped variable to hold the automaton object
-        var sampleCA;
+        let sampleCA;
         
+        // state objects to represent alive and dead
+        const alive = new bartificer.ca.State(true, 'Alive');
+        const dead = new bartificer.ca.State(false, 'Dead');
+            
         // a render function to render live cells green and dead cells red
         function renderRedGreen($td, s){
             // render a true state as green, and false as red
-            if(s == true){
+            if(s.value() == true){
                 $td.css('background-color', 'Green');
             }else{
                 $td.css('background-color', '#ff9999');
             }
         }
         
-        // an initialisation function to randomly set each cell to true or false
-        function randomBoolean(){
-            return Math.random() < 0.5 ? true : false;
+        // an initialisation function to randomly set each cell to alive or dead
+        function randomState(){
+            return Math.random() < 0.5 ? alive : dead;
         }
         
         // a step function that implements Conway's game of life
         function lifeStep(currentState, neighbourStates){
+            
             // calcualte the number of live neighbours
-            var numLiveNeighbours = 0;
+            let numLiveNeighbours = 0;
             neighbourStates.forEach(function(s){
-                if(s == true) numLiveNeighbours++;
+                if(s !== null && s.value() == true) numLiveNeighbours++;
             });
             
             // apply the rules based on the current state
-            if(currentState == true){
+            if(currentState.value() == true){
                 // currently alive - apply rules 1 to 3
                 
                 // rule 1
-                if(numLiveNeighbours < 2) return false;
+                if(numLiveNeighbours < 2) return dead;
                 
                 // rule 3
-                if(numLiveNeighbours > 3) return false;
+                if(numLiveNeighbours > 3) return dead;
             }else{
                 // currently dead - apply rule 4
-                if(numLiveNeighbours === 3) return true;
+                if(numLiveNeighbours === 3) return alive;
             }
             
             // default to no change (incorporates rule 2)
@@ -64,7 +69,7 @@
                 100, 200, // make it a 200x100 grid
                 lifeStep, // pass the game of life step function
                 renderRedGreen, // pass our red/green render function
-                randomBoolean // initialise each cell to a random boolean
+                randomState // initialise each cell to a random boolean
             );
             
             // log the geneated automaton object so we can have a look inside
@@ -73,7 +78,7 @@
             
             // add a click handler to the respawn button
             $('#respawn_btn').click(function(){
-                sampleCA.setState(randomBoolean);
+                sampleCA.setState(randomState);
             });
             
             // add a click handler to the step button
