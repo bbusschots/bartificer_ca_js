@@ -184,7 +184,7 @@ QUnit.module('bartificer.ca.State prototype', {}, ()=>{
     });
     
     QUnit.module(
-        'accessors',
+        'read-only accessors',
         {
             beforeEach: function(){
                 this.v = true;
@@ -194,59 +194,14 @@ QUnit.module('bartificer.ca.State prototype', {}, ()=>{
         },
         ()=>{
             QUnit.test('.value()', function(a){
-                const mustThrow = dummyBasicTypesExcept('bool', 'num', 'str');
-                
-                a.expect(mustThrow.length + 3);
-            
-                // make sure the accessor exists
+                a.expect(2);
                 a.strictEqual(typeof this.s1.value, 'function', 'function exists');
-            
-                // make sure the accessor returns the correct value
                 a.strictEqual(this.s1.value(), this.v, 'returns the expected value');
-                
-                // make sure the new value is properly stored
-                this.s1.value(1);
-                a.strictEqual(this.s1._value, 1, 'sets the value as expected');
-                
-                // make sure attempts to set an invalid value throw a TypeError
-                mustThrow.forEach((tn)=>{
-                    const t = DUMMY_BASIC_TYPES[tn];
-                    a.throws(
-                        ()=>{ this.s1.value(t.val); },
-                        TypeError,
-                        `value cannot be set to ${t.desc}`
-                    );
-                });
             });
             QUnit.test('.label()', function(a){
-                const mustThrow = dummyBasicTypesExcept('str');
-                
-                a.expect(mustThrow.length + 4);
-            
-                // make sure the accessor exists
+                a.expect(2);
                 a.strictEqual(typeof this.s1.label, 'function', 'function exists');
-            
-                // make sure the accessor returns the correct value
                 a.strictEqual(this.s1.label(), this.l, 'returns the expected value');
-                
-                // make sure the new value is properly stored
-                this.s1.label('Still Alive');
-                a.strictEqual(this.s1._label, 'Still Alive', 'sets the value as expected');
-                
-                // make sure attempts to set an invalid label throw a TypeError
-                mustThrow.forEach((tn)=>{
-                    const t = DUMMY_BASIC_TYPES[tn];
-                    a.throws(
-                        ()=>{ this.s1.label(t.val); },
-                        TypeError,
-                        `label cannot be set to ${t.desc}`
-                    );
-                });
-                a.throws(
-                    ()=>{ this.s1.label(''); },
-                    TypeError,
-                    `label cannot be set to an empty string`
-                );
             });
         }
     );
@@ -1202,19 +1157,23 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
                 const ca2 = new bartificer.ca.Automaton($('<div></div>'), 2, 2, this.sFn, this.rFn, initStates);
                 a.strictEqual(ca2.cellState(0, 1)._value, initStates[0][1]._value, 'returns the expected value');
             });
-            QUnit.todo('.cellNeighbourStates()', function(a){
+            QUnit.test('.cellNeighbourStates()', function(a){
                 a.expect(6);
                 
                 // make sure the accessor exists
                 a.strictEqual(typeof this.ca1.cellNeighbourStates, 'function', 'function exists');
                 
                 // build a CA to test against
+                const dummyStates = [];
+                for(let i = 1; i <= 20; i++){
+                    dummyStates[i] = new bartificer.ca.State(i, `${i}`);
+                }
                 const stateArray = [
-                    [new bartificer.ca.State(1, '1'),  new bartificer.ca.State(6, '6'), new bartificer.ca.State(11, '11'), new bartificer.ca.State(16, '16')],
-                    [new bartificer.ca.State(2, '2'),  new bartificer.ca.State(7, '7'), new bartificer.ca.State(12, '12'), new bartificer.ca.State(17, '17')],
-                    [new bartificer.ca.State(3, '3'),  new bartificer.ca.State(8, '8'), new bartificer.ca.State(13, '13'), new bartificer.ca.State(18, '18')],
-                    [new bartificer.ca.State(4, '4'),  new bartificer.ca.State(9, '9'), new bartificer.ca.State(14, '14'), new bartificer.ca.State(19, '19')],
-                    [new bartificer.ca.State(5, '5'), new bartificer.ca.State(10, '10'), new bartificer.ca.State(15, '15'), new bartificer.ca.State(20, '20')]
+                    [dummyStates[1],  dummyStates[6], dummyStates[11], dummyStates[16]],
+                    [dummyStates[2],  dummyStates[7], dummyStates[12], dummyStates[17]],
+                    [dummyStates[3],  dummyStates[8], dummyStates[13], dummyStates[18]],
+                    [dummyStates[4],  dummyStates[9], dummyStates[14], dummyStates[19]],
+                    [dummyStates[5], dummyStates[10], dummyStates[15], dummyStates[20]]
                 ];
                 // above represents grid:
                 //  1  2  3  4  5
@@ -1224,33 +1183,37 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
                 const ca = new bartificer.ca.Automaton($('<div></div>'), 4, 5, this.sFn, this.rFn, stateArray);
                 
                 // check an internal cell
-                a.deepEqual(ca.cellNeighbourStates(3, 2), [9, 10, 15, 20, 19, 18, 13, 8], 'internal cell OK'); // TO REFACTOR
+                a.deepEqual(ca.cellNeighbourStates(3, 2), [dummyStates[9], dummyStates[10], dummyStates[15], dummyStates[20], dummyStates[19], dummyStates[18], dummyStates[13], dummyStates[8]], 'internal cell OK');
                 
                 // check the four corners
-                a.deepEqual(ca.cellNeighbourStates(0, 0), [null, null, 2, 7, 6, null, null, null], 'top-left corner OK'); // TO REFACTOR
-                a.deepEqual(ca.cellNeighbourStates(4, 0), [null, null, null, null, 10, 9, 4, null], 'top-right corner OK'); // TO REFACTOR
-                a.deepEqual(ca.cellNeighbourStates(4, 3), [15, null, null, null, null, null, 19, 14], 'bottom-right corner OK'); // TO REFACTOR
-                a.deepEqual(ca.cellNeighbourStates(0, 3), [11, 12, 17, null, null, null, null, null], 'bottom-left corner OK'); // TO REFACTOR
+                a.deepEqual(ca.cellNeighbourStates(0, 0), [null, null, dummyStates[2], dummyStates[7], dummyStates[6], null, null, null], 'top-left corner OK');
+                a.deepEqual(ca.cellNeighbourStates(4, 0), [null, null, null, null, dummyStates[10], dummyStates[9], dummyStates[4], null], 'top-right corner OK');
+                a.deepEqual(ca.cellNeighbourStates(4, 3), [dummyStates[15], null, null, null, null, null, dummyStates[19], dummyStates[14]], 'bottom-right corner OK');
+                a.deepEqual(ca.cellNeighbourStates(0, 3), [dummyStates[11], dummyStates[12], dummyStates[17], null, null, null, null, null], 'bottom-left corner OK');
             });
-            QUnit.todo('.step()', function(a){  // TO REFACTOR
+            QUnit.test('.step()', function(a){
                 a.expect(1);
                 
                 // create a CA with a step function that increments the state by 1
+                const dummyStates = [];
+                for(let i = 1; i <= 26; i++){
+                    dummyStates[i] = new bartificer.ca.State(i, `${i}`);
+                }
                 const stateArrayPre = [
-                    [1,  6, 11, 16, 21],
-                    [2,  7, 12, 17, 22],
-                    [3,  8, 13, 18, 23],
-                    [4,  9, 14, 19, 24],
-                    [5, 10, 15, 20, 25]
+                    [dummyStates[1],  dummyStates[6], dummyStates[11], dummyStates[16], dummyStates[21]],
+                    [dummyStates[2],  dummyStates[7], dummyStates[12], dummyStates[17], dummyStates[22]],
+                    [dummyStates[3],  dummyStates[8], dummyStates[13], dummyStates[18], dummyStates[23]],
+                    [dummyStates[4],  dummyStates[9], dummyStates[14], dummyStates[19], dummyStates[24]],
+                    [dummyStates[5], dummyStates[10], dummyStates[15], dummyStates[20], dummyStates[25]]
                 ];
                 const stateArrayPost = [
-                    [2,  7, 12, 17, 22],
-                    [3,  8, 13, 18, 23],
-                    [4,  9, 14, 19, 24],
-                    [5, 10, 15, 20, 25],
-                    [6, 11, 16, 21, 26]
+                    [dummyStates[2],  dummyStates[7], dummyStates[12], dummyStates[17], dummyStates[22]],
+                    [dummyStates[3],  dummyStates[8], dummyStates[13], dummyStates[18], dummyStates[23]],
+                    [dummyStates[4],  dummyStates[9], dummyStates[14], dummyStates[19], dummyStates[24]],
+                    [dummyStates[5], dummyStates[10], dummyStates[15], dummyStates[20], dummyStates[25]],
+                    [dummyStates[6], dummyStates[11], dummyStates[16], dummyStates[21], dummyStates[26]]
                 ];
-                const ca = new bartificer.ca.Automaton($('<div></div>'), 5, 5, function(s){ return s + 1; }, function(){ }, stateArrayPre);
+                const ca = new bartificer.ca.Automaton($('<div></div>'), 5, 5, function(s){ return dummyStates[s.value() + 1]; }, function(){ }, stateArrayPre);
                 
                 // step the CA
                 ca.step();
@@ -1259,7 +1222,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
                 let allOK = true;
                 for(let x = 0; x < 5; x++){
                     for(let y = 0; y < 5; y++){
-                        if(ca.cellState(x, y) !== stateArrayPost[x][y]) allOK = false;
+                        if(ca.cellState(x, y)._value !== stateArrayPost[x][y]._value) allOK = false;
                     }
                 }
                 a.ok(allOK, 'all cells were stepped correctly');
