@@ -222,6 +222,20 @@ QUnit.module('bartificer.ca.State prototype', {}, ()=>{
         a.strictEqual(s1._value, s2._value, 'value correctly cloned');
         a.strictEqual(s1._label, s2._label, 'label correctly cloned');
     });
+    
+    QUnit.test('.equals()', (a)=>{
+        a.expect(9);
+        a.strictEqual(typeof bartificer.ca.State.prototype.equals, 'function', 'function exists');
+        const s1 = new bartificer.ca.State(true, 'Alive');
+        a.strictEqual(s1.equals(), false, 'no arguments returns false');
+        a.strictEqual(s1.equals(new Date()), false, 'non-State object not considered equal');
+        a.strictEqual(s1.equals(new bartificer.ca.State(false, 'Dead')), false, 'different value and label not considered equal');
+        a.strictEqual(s1.equals(new bartificer.ca.State(42, 'Alive')), false, 'different value but same label not considered equal');
+        a.strictEqual(s1.equals(new bartificer.ca.State(true, 'very alive')), false, 'same value but different label not considered equal');
+        a.strictEqual(s1.equals(new bartificer.ca.State('true', 'Alive')), false, 'different types of same and same label not considered equal');
+        a.strictEqual(s1.equals(s1), true, 'reference to self considered equal to self');
+        a.strictEqual(s1.equals(new bartificer.ca.State(true, 'Alive')), true, 'new State with same value and label considered equal');
+    });
 });
 
 //
