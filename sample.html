@@ -22,7 +22,7 @@
         // a render function to render live cells green and dead cells red
         function renderRedGreen($td, s){
             // render a true state as green, and false as red
-            if(s.value() == true){
+            if(s && s.value() == true){
                 $td.css('background-color', 'Green');
             }else{
                 $td.css('background-color', '#ff9999');
@@ -68,8 +68,10 @@
                 $('#game_of_life_container'), // use the div as the container
                 100, 200, // make it a 200x100 grid
                 lifeStep, // pass the game of life step function
-                renderRedGreen, // pass our red/green render function
-                randomState // initialise each cell to a random boolean
+                {
+                    renderFunction: renderRedGreen, // pass our red/green render function
+                    initialState: randomState // initialise each cell to a random boolean
+                }
             );
             
             // log the geneated automaton object so we can have a look inside

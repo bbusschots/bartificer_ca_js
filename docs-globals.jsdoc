@@ -101,7 +101,7 @@
  * automaton.
  *
  * @callback renderFunction
- * @param {jQuerySingleTD} rFn - a jQuery object representing the table data
+ * @param {jQuerySingleTD} $td - a jQuery object representing the table data
  * cell to be rendered.
  * @param {CellState} s - the state of the cell the table data cell represents.
  */
