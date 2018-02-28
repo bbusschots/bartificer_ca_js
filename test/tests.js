@@ -601,7 +601,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
         });
         
         QUnit.test('argument processing', (a)=>{
-            a.expect(18);
+            a.expect(19);
             const sFn = ()=>{ return new bartificer.ca.State(true, 'Alive'); };
             
             // make sure required arguments are indeed required
@@ -637,7 +637,12 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
                     sFn,
                     {
                         renderFn: ()=>{},
-                        initState: new bartificer.ca.State(true, 'Alive')
+                        initState: new bartificer.ca.State(true, 'Alive'),
+                        cellStates: [
+                            new bartificer.ca.State('R', 'Red'),
+                            new bartificer.ca.State('G', 'Green'),
+                            new bartificer.ca.State('B', 'Blue')
+                        ]
                     }
                 ),
                 'presence of optional arguments does not throw an error'
@@ -648,8 +653,12 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
             const r = 10;
             const c = 10;
             const rFn = ()=>{};
-            const s = new bartificer.ca.State(true, 'Alive');
-            const ca1 = new bartificer.ca.Automaton($div, r, c, sFn, {renderFunction: rFn, initialState: s});
+            const cs = [
+                new bartificer.ca.State('R', 'Red'),
+                new bartificer.ca.State('G', 'Green'),
+                new bartificer.ca.State('B', 'Blue')
+            ];
+            const ca1 = new bartificer.ca.Automaton($div, r, c, sFn, {renderFunction: rFn, initialState: cs[0], cellStates: cs});
             a.strictEqual(ca1._$container, $div, 'the container was correctly stored within the object');
             a.strictEqual(ca1._rows, r, 'the number of rows was correctly stored within the object');
             a.strictEqual(ca1._cols, c, 'the number of columns was correctly stored within the object');
@@ -660,7 +669,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
             let allCellsOK = true;
             for(let x = 0; x < c && allCellsOK; x++){
                 for(let y = 0; y < r; y++){
-                    if(ca1.cell(x, y).state()._value !== s._value) allCellsOK = false;
+                    if(ca1.cell(x, y).state()._value !== cs[0]._value) allCellsOK = false;
                 }
             }
             a.ok(allCellsOK, 'single initial state correctly applied to all cells');
@@ -685,6 +694,18 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
                 }
             }
             a.ok(allCellsOK, 'Initialisation function correctly applied to all cells');
+            
+            // make sure the set of cell states is properly stored and the lookup properly built
+            let allStatesOK = true;
+            for(let i = 0; i < cs.length; i++){
+                if(!cs[i].equals(ca1._cellStates[i])){
+                    allStatesOK = false;
+                }
+                if(!cs[i].equals(ca1._statesByValue[cs[i].value()])){
+                    allStatesOK = false;
+                }
+            }
+            a.ok(allStatesOK, 'All allowed cell states correctly stored, and the lookup table correctly built');
             
             // make sure the generation counter initialise to the expected initial value
             a.strictEqual(ca1._generation, 0, 'generation counter initialised to zero');
@@ -904,6 +925,53 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
             );
         });
         
+        QUnit.test('allowed states validation', (a)=>{
+            const mustThrow = dummyBasicTypesExcept('arr', 'undef');
+            
+            a.expect(mustThrow.length + 4);
+            
+            const r = 2;
+            const c = 2;
+            const fn = ()=>{};
+            const cs = [
+                new bartificer.ca.State('R', 'Red'),
+                new bartificer.ca.State('G', 'Green'),
+                new bartificer.ca.State('B', 'Blue')
+            ];
+            
+            // make sure all the disalowed basic types throw an error
+            mustThrow.forEach((tn)=>{
+                const t = DUMMY_BASIC_TYPES[tn];
+                a.throws(
+                    ()=>{ const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, {cellStates: t.val}); },
+                    TypeError,
+                    `allowed cell states cannot be ${t.desc}`
+                );
+            });
+            
+             // make sure empty arrays and single-value arrays throw
+            a.throws(
+                ()=>{ const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, {cellStates: []}); },
+                TypeError,
+                'allowed cell states cannot be an empty array'
+            );
+            a.throws(
+                ()=>{ const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, {cellStates: [cs[0]]}); },
+                TypeError,
+                'allowed cell states cannot be an single-entry array'
+            );
+            a.throws(
+                ()=>{ const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, {cellStates: [cs[0], cs[0].clone()]});  console.log(ca1); },
+                TypeError,
+                'allowed cell states cannot be two states with the same value'
+            );
+            a.throws(
+                ()=>{ const ca1 = new bartificer.ca.Automaton($('<div></div>'), r, c, fn, {cellStates: [cs[0], cs[1], cs[1].clone()]}); },
+                TypeError,
+                'duplicate states throw error'
+            );
+        });
+        
         QUnit.test('grid was correctly initialised', (a)=>{
             const r = 2;
             const c = 2;
@@ -1033,9 +1101,15 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
                 this.$div = $('<div></div>');
                 this.r = 4;
                 this.c = 2;
-                this.sFn = ()=>{ return new bartificer.ca.State(true, 'Alive'); };
+                this.cs = [
+                    new bartificer.ca.State('R', 'Red'),
+                    new bartificer.ca.State('G', 'Green'),
+                    new bartificer.ca.State('B', 'Blue')
+                ];
+                this.s = this.cs[0].clone();
+                this.sFn = ()=>{ return this.s; };
                 this.rFn = ()=>{};
-                this.ca1 = new bartificer.ca.Automaton(this.$div, this.r, this.c, this.sFn, {renderFunction: this.rFn, initialState: new bartificer.ca.State(true, 'Alive')});
+                this.ca1 = new bartificer.ca.Automaton(this.$div, this.r, this.c, this.sFn, {renderFunction: this.rFn, initialState: this.s, cellStates: this.cs});
             }
         },
         function(){
@@ -1139,6 +1213,74 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
                     Error,
                     'attempt to set throws error'
                 );
+            });
+            QUnit.test('.cellStates()', function(a){
+                a.expect(4);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.cellStates, 'function', 'function exists');
+            
+                // make sure the accessor returns the correct value
+                const testVal = this.ca1.cellStates();
+                a.ok($.isArray(testVal) && testVal.length === this.cs.length, 'returns array of expected length');
+                let allStatesOK = true;
+                for(let i = 0; i < this.cs.length; i++){
+                    if(!this.cs[i].equals(testVal[i])){
+                        allStatesOK = false;
+                    }
+                }
+                a.ok(allStatesOK, 'returns the expected values');
+                
+                // make sure attempts to set a value throw an Error
+                a.throws(
+                    ()=>{ this.ca1.cellStates([this.cs[0], this.cs[1]]); },
+                    Error,
+                    'attempt to set throws error'
+                );
+            });
+            QUnit.test('.stateFromValue()', function(a){
+                const mustThrow = dummyBasicTypesExcept('bool', 'num', 'str');
+                a.expect(mustThrow.length + 3);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.stateFromValue, 'function', 'function exists');
+                
+                // check parameter validation
+                mustThrow.forEach((tn)=>{
+                    const t = DUMMY_BASIC_TYPES[tn];
+                    a.throws(
+                        ()=>{ this.caa.stateFromValue(t.val); },
+                        TypeError,
+                        `first argument can't be ${t.desc}`
+                    );
+                });
+                
+                // make sure a state that exists is returned
+                a.ok(this.ca1.stateFromValue(this.cs[0].value()).equals(this.cs[0]), 'defined state is returned');
+                
+                // make sure undefined is returned for a state that doesn't exist
+                a.ok(typeof this.ca1.stateFromValue('boogers') === 'undefined', 'undefined is returned for a value with no matchign state');
+            });
+            QUnit.test('.hasState()', function(a){
+                const mustReturnFalse = dummyBasicTypesExcept('bool', 'num', 'str');
+                a.expect(mustReturnFalse.length + 5);
+            
+                // make sure the accessor exists
+                a.strictEqual(typeof this.ca1.hasState, 'function', 'function exists');
+                
+                // make sure a state that exists is found via both a primitive value and a state
+                a.strictEqual(this.ca1.hasState('R'), true, 'state found when passed as a primitive value');
+                a.strictEqual(this.ca1.hasState(this.cs[0]), true, 'state found when passed as an object ');
+                
+                // make sure a state that doesn't exist is not found when specified as a primitive or a state
+                a.strictEqual(this.ca1.hasState('boogers'), false, 'non-existent state not found when passed as a primitive value');
+                a.strictEqual(this.ca1.hasState(new bartificer.ca.State('boogers', 'Boogers')), false, 'non-existent state not found when passed as an object');
+                
+                // make sure invalid arguments return false
+                mustReturnFalse.forEach((tn)=>{
+                    const t = DUMMY_BASIC_TYPES[tn];
+                    a.strictEqual(this.ca1.hasState(t.val), false, `${t.desc} returns false`);
+                });
             });
             QUnit.test('.generation()', function(a){
                 a.expect(3);
