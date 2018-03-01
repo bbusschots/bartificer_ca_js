@@ -1341,7 +1341,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
                 //  6  7  8  9 10
                 // 11 12 13 14 15
                 // 16 17 18 19 20
-                const ca = new bartificer.ca.Automaton($('<div></div>'), 4, 5, this.sFn, {initialState: stateArray});
+                const ca = new bartificer.ca.Automaton($('<div></div>'), 4, 5, this.sFn, {initialState: stateArray, cellStates: dummyStates.slice(1)});
                 
                 // check an internal cell
                 a.deepEqual(ca.cellNeighbourStates(3, 2), [dummyStates[9], dummyStates[10], dummyStates[15], dummyStates[20], dummyStates[19], dummyStates[18], dummyStates[13], dummyStates[8]], 'internal cell OK');
@@ -1353,7 +1353,7 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
                 a.deepEqual(ca.cellNeighbourStates(0, 3), [dummyStates[11], dummyStates[12], dummyStates[17], null, null, null, null, null], 'bottom-left corner OK');
             });
             QUnit.test('.step()', function(a){
-                a.expect(1);
+                a.expect(2);
                 
                 // create a CA with a step function that increments the state by 1
                 const dummyStates = [];
@@ -1374,19 +1374,30 @@ QUnit.module('bartificer.ca.Automaton prototype', {}, ()=>{
                     [dummyStates[5], dummyStates[10], dummyStates[15], dummyStates[20], dummyStates[25]],
                     [dummyStates[6], dummyStates[11], dummyStates[16], dummyStates[21], dummyStates[26]]
                 ];
-                const ca = new bartificer.ca.Automaton($('<div></div>'), 5, 5, function(s){ return dummyStates[s.value() + 1]; }, {initialState: stateArrayPre});
+                const ca1 = new bartificer.ca.Automaton($('<div></div>'), 5, 5, function(s){ return dummyStates[s.value() + 1]; }, {initialState: stateArrayPre, cellStates: dummyStates.slice(1)});
                 
                 // step the CA
-                ca.step();
+                ca1.step();
                 
                 // make sure each state was incremented by 1
                 let allOK = true;
                 for(let x = 0; x < 5; x++){
                     for(let y = 0; y < 5; y++){
-                        if(ca.cellState(x, y)._value !== stateArrayPost[x][y]._value) allOK = false;
+                        if(ca1.cellState(x, y)._value !== stateArrayPost[x][y]._value) allOK = false;
                     }
                 }
-                a.ok(allOK, 'all cells were stepped correctly');
+                a.ok(allOK, 'all cells were stepped correctly with step function that returns State object');
+                
+                // make sure state coercion works as expected
+                const ca2 = new bartificer.ca.Automaton($('<div></div>'), 5, 5, function(s){ return s.value() + 1; }, {initialState: stateArrayPre, cellStates: dummyStates.slice(1)});
+                ca2.step();
+                allOK = true;
+                for(let x = 0; x < 5; x++){
+                    for(let y = 0; y < 5; y++){
+                        if(ca2.cellState(x, y)._value !== stateArrayPost[x][y]._value) allOK = false;
+                    }
+                }
+                a.ok(allOK, 'all cells were stepped correctly with step function that returns primitive values that needed to be coerced');
             });
         }
     );
