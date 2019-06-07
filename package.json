@@ -19,7 +19,7 @@
   "homepage": "https://github.com/bbusschots/bartificer_ca_js#readme",
   "devDependencies": {
     "@bbusschots/minami-bartificer": "^1.2.3",
-    "jsdoc": "^3.4.3",
+    "jsdoc": "^3.6.2",
     "minami": "^1.1.1"
   }
 }
